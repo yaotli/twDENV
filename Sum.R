@@ -76,3 +76,82 @@ mat=data.frame()
 }
     colnames(mat) <- c("File1", "File2", "File3", "File4", "TotalReads", "PIn", "PDel", "PNull", "PReadIn", "MaxQ", "MinQ", "MeanQ")
     write.csv(mat, "QC.csv")
+    
+    
+####################### 
+
+#Assay the deepness of the summarized data
+    
+    
+setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/SUM")
+subls <-list.files(getwd())
+
+mat<-matrix(ncol=3000)
+
+for(i in 1:length(subls)){
+ 
+  matt=matrix(ncol=3000)
+  ah <- read.csv(subls[i])
+  
+  for(k in 3:length(ah)){
+    
+    tck<-sum(ah[,k][1], ah[,k][2], ah[,k][3], ah[,k][4])
+    matt[,k-2]=tck
+  }
+  
+  mat=rbind(mat, matt) 
+  
+}
+
+mat=mat[-1,]
+write.csv(mat, "Deep.csv")
+
+###########
+
+#generate the figure
+
+ah<-read.csv(file.choose()) #ie, Deep.csv from last section
+ahh <- as.matrix(ahh)
+
+ahh=ah[,-1]
+
+#matplot(t(ah), type=c('l'), ylim=c(0,200000))
+
+
+#880-2525
+ahhd <- ahh[,-1:-879]
+ahhd <- ahhd[, -1647:-2121]
+
+library(reshape2)
+ahhd.m <- melt(ahhd)
+
+#library(easyGgplot2)
+#ggplot2.stripchart(data=ahhd.m, xName='Var2', yName='value', shape=1) + 
+#  theme(axis.text.x=element_text(angle=90)) #the result is too complicated
+
+ahh.med<-apply(ahh, 2, median)
+ahh.min<-apply(ahh, 2, min)
+#ahh.max<-apply(ahh, 2, max)
+
+ahl <- rbind(ahh.med, ahh.min)
+ahl <- ahl[,-1:-879]
+ahl <- ahl[,-1647:-2121]
+ahl.m <- melt(ahl)
+
+bk <- attributes(ahhd)$dimnames[[2]]
+
+a=seq(0,17) a=a*100+21
+b=seq(9,25)*100
+bkk=c() 
+for(i in 1:17){
+  bkk[i] <- bk[a[i]]
+  
+} #deal with xaxis label 
+
+a<-ggplot(data=ahl.m, aes(Var2, value, group=Var1, color=Var1)) + 
+  geom_line(size=2) + scale_x_discrete(breaks=bkk, labels=b) + xlab("") +
+  ylab("Numbers of total reads per site") + theme_bw() +
+  theme(axis.text.x=element_text(size=10), axis.title=element_text(size=16,face="bold")) +
+  theme(legend.position="none")
+
+
