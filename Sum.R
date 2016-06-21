@@ -1,3 +1,4 @@
+#to creat summary files (SUM)
 
 setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/aligned")
 subls <-list.files(getwd())
@@ -34,3 +35,44 @@ for(i in 1:length(subls)){
   print(Sys.time()-t1)
   print(subls[i])
 }
+
+
+
+####################### 
+
+#QC
+
+setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/LOG")
+subls <-list.files(getwd())
+
+mat=data.frame()
+
+  for(i in 1:length(subls)){
+    
+    
+    ah <- read.csv(subls[i], stringsAsFactors = FALSE)
+    
+    qfiles<-ah$File[1:4]
+    qNin<-sum(!is.na(ah$insert))
+    qNdel<-sum(!is.na(ah$deletion))
+    qNnull<-sum(!is.na(ah$zero))
+    qNout<-sum(!is.na(ah$quality))
+    qNTotal<-sum(qNin, qNdel, qNnull, qNout)
+
+    qPin<-qNin/qNTotal*100
+    qPdel<-qNdel/qNTotal*100
+    qPnull<-qNnull/qNTotal*100
+    qPout<-qNout/qNTotal*100
+
+    qMeq<-mean(ah$quality)
+    qMxq<-max(ah$quality)
+    qMnq<-min(ah$quality)
+    
+    qDF <- data.frame(qfiles[1], qfiles[2], qfiles[3], qfiles[4], 
+                      qNTotal, qPin, qPdel, qPnull, qPout, 
+                      qMxq, qMnq, qMeq)
+    mat=rbind(mat, qDF)
+    
+}
+    colnames(mat) <- c("File1", "File2", "File3", "File4", "TotalReads", "PIn", "PDel", "PNull", "PReadIn", "MaxQ", "MinQ", "MeanQ")
+    write.csv(mat, "QC.csv")
