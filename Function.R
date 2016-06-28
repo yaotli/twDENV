@@ -83,6 +83,31 @@ ponG<-function(csvfile, position){
   
 }
 
+#3. Vector-Directed pon (with multiple samples' percentage)
+#require pon (*4)
+vdpon<-function(site, nameoflist){
+  
+  pA=c()
+  pT=c()
+  pC=c()
+  pG=c()
+  
+  for (i in 1: length(nameoflist)){
+    
+    pA[i] = ponA(nameoflist[i], site)
+    pT[i] = ponT(nameoflist[i], site)
+    pC[i] = ponC(nameoflist[i], site)
+    pG[i] = ponG(nameoflist[i], site)
+    
+  }
+  rrm <- cbind(pA, pT, pC, pG)
+  return(rrm)
+  
+  
+}
+
+
+
 #Detection of variant (dvariant)
 
 dvariant<-function(ddf, pc){
