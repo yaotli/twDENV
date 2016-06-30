@@ -1,4 +1,4 @@
-#to creat summary files (SUM)
+#to creat summary files (SUM) ----------------------------------------
 
 setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/aligned")
 subls <-list.files(getwd())
@@ -36,11 +36,7 @@ for(i in 1:length(subls)){
   print(subls[i])
 }
 
-
-
-####################### 
-
-#QC
+#Post Summarization QC  ---------------------------------------------
 
 setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/LOG")
 subls <-list.files(getwd())
@@ -77,11 +73,10 @@ mat=data.frame()
     colnames(mat) <- c("File1", "File2", "File3", "File4", "TotalReads", "PIn", "PDel", "PNull", "PReadIn", "MaxQ", "MinQ", "MeanQ")
     write.csv(mat, "QC.csv")
     
-    
-####################### 
 
-#Assay the deepness of the summarized data
+        
     
+#Assay the deepness of the summarized data   --------------------------
     
 setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/SUM")
 subls <-list.files(getwd())
@@ -106,29 +101,27 @@ for(i in 1:length(subls)){
 mat=mat[-1,]
 write.csv(mat, "Deep.csv")
 
-###########
-
-#generate the figure
+#generate the figure ----------------------
 
 ah<-read.csv(file.choose()) #ie, Deep.csv from last section
-ahh <- as.matrix(ahh)
-
-ahh=ah[,-1]
-
-#matplot(t(ah), type=c('l'), ylim=c(0,200000))
+ahh <- as.matrix(ahh) 
+ahh=ah[,-1] #to remove 1st column
 
 
-#880-2525
+#limit region to 880-2525 to reduce compupational space
 ahhd <- ahh[,-1:-879]
-ahhd <- ahhd[, -1647:-2121]
+ahhd <- ahhd[, -1647:-2121] 
 
 library(reshape2)
 ahhd.m <- melt(ahhd)
 
 #library(easyGgplot2)
 #ggplot2.stripchart(data=ahhd.m, xName='Var2', yName='value', shape=1) + 
-#  theme(axis.text.x=element_text(angle=90)) #the result is too complicated
+#                   theme(axis.text.x=element_text(angle=90)) 
+#the result is too complicated
 
+
+#to generate the mean and minimum in each position
 ahh.med<-apply(ahh, 2, median)
 ahh.min<-apply(ahh, 2, min)
 #ahh.max<-apply(ahh, 2, max)
@@ -136,22 +129,31 @@ ahh.min<-apply(ahh, 2, min)
 ahl <- rbind(ahh.med, ahh.min)
 ahl <- ahl[,-1:-879]
 ahl <- ahl[,-1647:-2121]
-ahl.m <- melt(ahl)
+ahl.m <- melt(ahl) #melt to fit the ggplot
 
-bk <- attributes(ahhd)$dimnames[[2]]
+bk <- attributes(ahhd)$names
 
-a=seq(0,17) a=a*100+21
-b=seq(9,25)*100
+xa=seq(0,17) 
+xa=xa*100+21
+b=seq(9,25)*100 #show labels: 900, 1000, 1100, ... 2500
+
+#to callout the real "names" in original x label, e.g. bk[21] = v900
 bkk=c() 
 for(i in 1:17){
-  bkk[i] <- bk[a[i]]
-  
-} #deal with xaxis label 
+  bkk[i] <- bk[xa[i]]
+} 
 
-a<-ggplot(data=ahl.m, aes(Var2, value, group=Var1, color=Var1)) + 
-  geom_line(size=2) + scale_x_discrete(breaks=bkk, labels=b) + xlab("") +
-  ylab("Numbers of total reads per site") + theme_bw() +
-  theme(axis.text.x=element_text(size=10), axis.title=element_text(size=16,face="bold")) +
-  theme(legend.position="none")
+#generate figure
+
+Fab<-ggplot(data=ahl.m, aes(Var2, value, group=Var1, color=Var1)) + 
+            geom_line(size=2) + scale_x_discrete(breaks=bkk, labels=b) + 
+            
+            xlab("") +
+            ylab("Numbers of total reads per site") + 
+  
+            theme_bw() +
+            theme(axis.text.x=element_text(size=10), 
+                  axis.title=element_text(size=16,face="bold")) +
+            theme(legend.position="none")
 
 
