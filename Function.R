@@ -113,6 +113,7 @@ vdpon<-function(site, nameoflist){
 dvariant<-function(ddf, pc){
   
   VarN<-c()
+  refN<-c()
   pVarN<-c()
   sVarN<-c()
   
@@ -129,30 +130,34 @@ dvariant<-function(ddf, pc){
       
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       
-      
       if (mm < tccpcp){
         
+        aamatrix=c("A","T","C","G")
         ii = i-2  
         
         if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
           (VarN[length(VarN)+1] = "A")
           (pVarN[length(pVarN)+1] = (dddf[1,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))}
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[which.max(mm)])}
         
         if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
           (VarN[length(VarN)+1] = "T")
           (pVarN[length(pVarN)+1] = (dddf[2,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))}
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[which.max(mm)])}
         
         if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
           (VarN[length(VarN)+1] = "C")
           (pVarN[length(pVarN)+1] = (dddf[3,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))}
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[which.max(mm)])}
         
         if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
           (VarN[length(VarN)+1] = "G")
           (pVarN[length(pVarN)+1] = (dddf[4,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))}
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[which.max(mm)])}
       }
       
       print(i/lth*100)
