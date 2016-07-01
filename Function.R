@@ -159,8 +159,6 @@ dvariant<-function(ddf, pc){
           (sVarN[length(sVarN)+1] = (ii))
           (refN[length(refN)+1] = aamatrix[which.max(mm)])}
       }
-      
-      print(i/lth*100)
     }
   }
   
