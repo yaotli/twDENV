@@ -162,6 +162,6 @@ dvariant<-function(ddf, pc){
     }
   }
   
-  rb<-data.frame(sVarN, VarN, pVarN)
+  rb<-data.frame(sVarN, VarN, refN, pVarN)
   return(rb)
 }
