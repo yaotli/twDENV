@@ -180,14 +180,20 @@ nsvariant<-function(dvdf, ls){
     
     sVarN = dvdf[[1]][i]
     
+    if(sVarN %%3 == 2 ){
+      
+      nsv[length(nsv)+1] = "FALSE"
+      
+    }
+    
     if(sVarN %%3 == 1 ){
       
-      n = strsplit(attributes(dvdf)$rownames, split = ".", fixed = T)[[i]][2] #number in list
-      fls <- read.csv(ls[n])
+      n = strsplit(attributes(dvdf)$row.names, split = ".", fixed = T)[[i]][2] #number in list
+      fls <- read.csv(ls[as.numeric(n)])
       
       aamatrix=c("A","T","C","G")
       
-      p = Pdvdf + 2
+      p = sVarN + 2
       
       pN = which.max(fls[[p]])
       p1N = which.max(fls[[p+1]])
@@ -198,17 +204,36 @@ nsvariant<-function(dvdf, ls){
       
       nsv[length(nsv)+1] = (translate(refaa) == translate(varaa))
       
-      
     }
       
+    if(sVarN %%3 == 0 ){
+      
+      n = strsplit(attributes(dvdf)$row.names, split = ".", fixed = T)[[i]][2] #number in list
+      fls <- read.csv(ls[as.numeric(n)])
+      
+      aamatrix=c("A","T","C","G")
+      
+      p = sVarN + 2
+      
+      pm2N = which.max(fls[[p-2]])
+      pm1N = which.max(fls[[p-1]])
+      pN = which.max(fls[[p]])
+      
+      refaa<-c(aamatrix[pm2N], aamatrix[pm1N], aamatrix[pN])
+      varaa<-c(aamatrix[pm2N], aamatrix[pm1N], aamatrix[dvdf[[2]][i]])
+      
+      nsv[length(nsv)+1] = (translate(refaa) == translate(varaa))
+      
+    }
     
-    
+print((i/dim(dvdf)[1])*100)
     
   }
   
     
   
-  
-  
+  return(nsv)
   
 }
+
+nsvariant(lldvar, ofile)
