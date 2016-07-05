@@ -292,16 +292,38 @@ dvariant2000r<-function(ddf, pc){
 #2.3 Group detection of dvariant
 #ls = list of csvfile
 #pc = percentage of curring poing
+#nr = number of reads as threshold: 0 = origin, 1 = 1000, 2 = 2000
 
+lsvariant<-function(ls, pc, nr){
 
-lsvariant<-function(ls, pc){
-  
-  for (i in 1:length(ls)){
+#dvariant
+  if( nr  == 0 ){    
+    for (i in 1:length(ls)){
     
     assign(paste0("sdf",".",i), dvariant(ls[i], pc)) #dataframe of sample
     print((i/length(ls)*100))
   }
+    }
+
+#dvariant1000  
+  if( nr == 1  ){    
+    for (i in 1:length(ls)){
+      
+      assign(paste0("sdf",".",i), dvariant1000r(ls[i], pc)) #dataframe of sample
+      print((i/length(ls)*100))
+    }
+  }
   
+#dvariant2000  
+  if( nr == 2   ){    
+    for (i in 1:length(ls)){
+      
+      assign(paste0("sdf",".",i), dvariant2000r(ls[i], pc)) #dataframe of sample
+      print((i/length(ls)*100))
+    }
+  }
+  
+      
     plist<-mget(paste0("sdf.",1:length(ls)))
     lldvar<-do.call("rbind", plist)
     
