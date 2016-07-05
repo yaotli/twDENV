@@ -383,7 +383,7 @@ nsvariant<-function(dvdf, ls){
       pN = which.max(fls[[p]])
       
       refaa<-c(aamatrix[pm2N], aamatrix[pm1N], aamatrix[pN])
-      varaa<-c(aamatrix[pm2N], aamatrix[pm1N], aamatrix[dvdf[[2]][i]])
+      varaa<-c(aamatrix[pm2N], aamatrix[pm1N], as.character(dvdf[[2]][i]))
        
       if(translate(refaa) == translate(varaa)){ nsv[length(nsv)+1] = "FALSE" } else 
                                               { nsv[length(nsv)+1] = "TRUE" }
