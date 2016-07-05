@@ -297,7 +297,7 @@ dvariant2000r<-function(ddf, pc){
 lsvariant<-function(ls, pc, nr){
 
 #dvariant
-  if( nr  == 0 ){    
+  if( nr == 0 ){    
     for (i in 1:length(ls)){
     
     assign(paste0("sdf",".",i), dvariant(ls[i], pc)) #dataframe of sample
