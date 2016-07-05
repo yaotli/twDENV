@@ -61,9 +61,9 @@ colnames(a)=c("C0", "C1", "%", "%", "aC0", "aC1", "a%", "a%")
 
 
 
-# paired C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25)
+# paired C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25) ------------------------
 
-pairedS.No <- c()                                             #all number of paired C0
+pairedS.No <- c()                                             #all number of paired C0 #n = 65
 for(i in 2: length(lsfull.NO)){
   
   k=i -1
@@ -71,7 +71,6 @@ for(i in 2: length(lsfull.NO)){
       strsplit(lsfull.NO[k], split="-", fixed = T)[[1]][1]){
     
     pairedS.No[length(pairedS.No)+1] = i-1
-    
   }
 }
 
