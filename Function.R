@@ -401,3 +401,50 @@ print((i/dim(dvdf)[1])*100)
   
 }
 
+
+#3.2 combined 2.3 + 3
+
+lsvariantNS<-function(ls, pc, nr){
+  
+  #dvariant
+  if( nr  == 0 ){    
+    for (i in 1:length(ls)){
+      
+      assign(paste0("sdf",".",i), dvariant(ls[i], pc)) #dataframe of sample
+      print((i/length(ls)*100))
+    }
+  }
+  
+  #dvariant1000  
+  if( nr == 1  ){    
+    for (i in 1:length(ls)){
+      
+      assign(paste0("sdf",".",i), dvariant1000r(ls[i], pc)) #dataframe of sample
+      print((i/length(ls)*100))
+    }
+  }
+  
+  #dvariant2000  
+  if( nr == 2   ){    
+    for (i in 1:length(ls)){
+      
+      assign(paste0("sdf",".",i), dvariant2000r(ls[i], pc)) #dataframe of sample
+      print((i/length(ls)*100))
+    }
+  }
+  
+  
+  plist<-mget(paste0("sdf.",1:length(ls)))
+  lldvar<-do.call("rbind", plist)
+  
+  lsns<-nsvariant(lldvar, ls)
+  ffls<-cbind(lldvar, lsns)
+  
+  return(ffls)
+}
+
+
+
+
+
+
