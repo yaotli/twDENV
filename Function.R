@@ -326,10 +326,11 @@ lsvariantNS<-function(ls, pc, nr){
 
 cdvariant<-function(ddf, pc, nr){
   
-  NpV = 0 #number of position with variant
-  NV = 0  #number of variant in all positions
-  pVa = 0 #number of nonsynonymous change in NpV
-  NVa = 0 ##number of nonsynonymous change in NV
+  NpV = 0 #number of "position with variant"
+  NV = 0  #"number of variant" in all positions
+  
+  NpVa = 0 #number of nonsynonymous "site" in NpV
+  NVa = 0 #number of nonsynonymous "variant" in NV
   
   nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
   
@@ -337,6 +338,9 @@ cdvariant<-function(ddf, pc, nr){
   lth = length(dddf)
   
   for(i in 3: lth){ #each position
+    
+    sitecount = 0
+    sitecountaa = 0
     
     if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) {
       
@@ -347,41 +351,48 @@ cdvariant<-function(ddf, pc, nr){
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       
       if ((mm <= tccpcp) & (tcc >= nrv[nr])){
-
+        
+        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
+        ii = i-2  
+        
         if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
-          (VarN[length(VarN)+1] = "A")
-          (pVarN[length(pVarN)+1] = (dddf[1,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
+          
+          sitecount = sitecount + 1
+          if ((nsvariantsite(ddf,ii ,nmax ,1)) == "TRUE"){ sitecountaa = sitecountaa + 1}
+          }
         
         if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
-          (VarN[length(VarN)+1] = "T")
-          (pVarN[length(pVarN)+1] = (dddf[2,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
+          
+          sitecount = sitecount + 1
+          if ((nsvariantsite(ddf,ii ,nmax ,2)) == "TRUE"){ sitecountaa = sitecountaa + 1}
+        }
         
         if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
-          (VarN[length(VarN)+1] = "C")
-          (pVarN[length(pVarN)+1] = (dddf[3,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
+          
+          sitecount = sitecount + 1
+          if ((nsvariantsite(ddf,ii ,nmax ,3)) == "TRUE"){ sitecountaa = sitecountaa + 1}
+        }
         
         if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
-          (VarN[length(VarN)+1] = "G")
-          (pVarN[length(pVarN)+1] = (dddf[4,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-      }
+          
+          sitecount = sitecount + 1
+          if ((nsvariantsite(ddf,ii ,nmax ,4)) == "TRUE"){ sitecountaa = sitecountaa + 1}
+        }
     }
     
+      
   }
   
-  rb<-data.frame(sVarN, VarN, refN, pVarN)
-  return(rb)
+    
+    if (sitecount != 0){ NpV = NpV + 1}
+    if (sitecountaa != 0){ NpVa = NpVa + 1}
+    
+    NV = sum(sitecount) + NV
+    NVa = sum(sitecountaa) + NVa
+  }
   
-  
-  
-  
+  re = c(NpV, NV, NpVa, NVa)
+  return(re)
 }
 
 
