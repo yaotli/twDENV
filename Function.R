@@ -262,8 +262,47 @@ print((i/dim(dvdf)[1])*100)
   
 }
 
+#3.2
+nsvariantsite<-function(df, site, wt, mu){ #wt, mu = 1(A), 2(T), 3(C), 4(G)
+  library(seqinr)
+  
+  ssite = as.numeric(site)
+  PoC = ssite %%3 
+  
+  if(PoC == 2){return("TRUE")} else {
+    
+    ddf <- read.csv(df)
+    aamatrix=c("A","T","C","G")
+    p = ssite + 2
+    
+    if(PoC == 1){
+      refaa<-c(aamatrix[as.numeric(wt)], aamatrix[which.max(ddf[[p+1]])], 
+               aamatrix[which.max(ddf[[p+2]])])
+      varaa<-c(aamatrix[as.numeric(mu)], aamatrix[which.max(ddf[[p+1]])], 
+               aamatrix[which.max(ddf[[p+2]])])
+      
+      if(translate(refaa) == translate(varaa)){ return("FALSE") } else 
+      { return("TRUE") }
+    }
+    
+    if(PoC == 0){
+      refaa<-c(aamatrix[which.max(ddf[[p-2]])], aamatrix[which.max(ddf[[p-1]])], 
+               aamatrix[as.numeric(wt)])
+      varaa<-c(aamatrix[which.max(ddf[[p-2]])], aamatrix[which.max(ddf[[p-1]])], 
+               aamatrix[as.numeric(mu)])
+      
+      if(translate(refaa) == translate(varaa)){ return("FALSE") } else 
+      { return("TRUE") }
+    }
+    
+    
+  }
+  
+  
+}
 
-#3.2 combined 2.3 + 3
+
+#3.3 combined 2.3 + 3
 
 lsvariantNS<-function(ls, pc, nr){
   
@@ -283,17 +322,21 @@ lsvariantNS<-function(ls, pc, nr){
 }
 
 
-#3.3 count only (for individual file)
+#3.4 count only (for individual file)
 
 cdvariant<-function(ddf, pc, nr){
   
-  dcount=c()
+  NpV = 0 #number of position with variant
+  NV = 0  #number of variant in all positions
+  pVa = 0 #number of nonsynonymous change in NpV
+  NVa = 0 ##number of nonsynonymous change in NV
+  
   nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
   
   dddf<-read.csv(ddf)
   lth = length(dddf)
   
-  for(i in 3: lth){
+  for(i in 3: lth){ #each position
     
     if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) {
       
@@ -304,12 +347,7 @@ cdvariant<-function(ddf, pc, nr){
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       
       if ((mm <= tccpcp) & (tcc >= nrv[nr])){
-        
-        aamatrix=c("A","T","C","G")
-        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
-        
-        ii = i-2  
-        
+
         if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
           (VarN[length(VarN)+1] = "A")
           (pVarN[length(pVarN)+1] = (dddf[1,i]/tcc))
@@ -340,11 +378,6 @@ cdvariant<-function(ddf, pc, nr){
   
   rb<-data.frame(sVarN, VarN, refN, pVarN)
   return(rb)
-  
-  
-  
-  
-  
   
   
   
