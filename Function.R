@@ -132,7 +132,7 @@ dvariant<-function(ddf, pc, nr){
       
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       
-      if ((mm < tccpcp) & (tcc >= nrv[nr])){
+      if ((mm <= tccpcp) & (tcc >= nrv[nr])){
         
         aamatrix=c("A","T","C","G")
         nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
@@ -285,9 +285,10 @@ lsvariantNS<-function(ls, pc, nr){
 
 #3.3 count only (for individual file)
 
-cdvariant(ddf, pc, nr){
+cdvariant<-function(ddf, pc, nr){
   
   dcount=c()
+  nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
   
   dddf<-read.csv(ddf)
   lth = length(dddf)
@@ -302,7 +303,7 @@ cdvariant(ddf, pc, nr){
       
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       
-      if (mm < tccpcp){
+      if ((mm <= tccpcp) & (tcc >= nrv[nr])){
         
         aamatrix=c("A","T","C","G")
         nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
