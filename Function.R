@@ -1,6 +1,6 @@
 #Fuctions to detect minor variant
 
-##1. Proportion of Nucleotide (pon)
+##1. Proportion of Nucleotide (pon) --------------------------------
 pon<-function(csvfile, nucleotide, position){
   
   #ddf = read.csv(files)
@@ -109,14 +109,15 @@ vdpon<-function(site, nameoflist){
 }
 
 
-##2 Detection of variant (dvariant) 
+##2 Detection of variant (dvariant) --------------------------------
 #ddf = a csvfile name
-dvariant<-function(ddf, pc){
+dvariant<-function(ddf, pc, nr){
   
   VarN<-c()
   refN<-c()
   pVarN<-c()
   sVarN<-c()
+  nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
   
   dddf<-read.csv(ddf)
   lth = length(dddf)
@@ -131,7 +132,7 @@ dvariant<-function(ddf, pc){
       
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       
-      if (mm < tccpcp){
+      if ((mm < tccpcp) & (tcc >= nrv[nr])){
         
         aamatrix=c("A","T","C","G")
         nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
@@ -170,167 +171,27 @@ dvariant<-function(ddf, pc){
   return(rb)
 }
 
-#2.2 Detection of variant (dvariant) with reliable reads number
-dvariant1000r<-function(ddf, pc){
-  
-  VarN<-c()
-  refN<-c()
-  pVarN<-c()
-  sVarN<-c()
-  
-  dddf<-read.csv(ddf)
-  lth = length(dddf)
-  
-  for(i in 3: lth){
-    
-    if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) {
-      
-      tcc = sum(dddf[1,i] + dddf[2,i] + dddf[3,i] + dddf[4,i])  #total counts
-      tccpc = tcc*pc  #least counts we are interested in
-      tccpcp = tcc*(1-pc) #maximum count of a putative consensus when minor population exits
-      
-      mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
-      
-      if ((mm < tccpcp) & (tcc > 1000)){
-        
-        aamatrix=c("A","T","C","G")
-        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
-        
-        ii = i-2  
-        
-        if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
-          (VarN[length(VarN)+1] = "A")
-          (pVarN[length(pVarN)+1] = (dddf[1,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-        
-        if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
-          (VarN[length(VarN)+1] = "T")
-          (pVarN[length(pVarN)+1] = (dddf[2,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-        
-        if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
-          (VarN[length(VarN)+1] = "C")
-          (pVarN[length(pVarN)+1] = (dddf[3,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-        
-        if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
-          (VarN[length(VarN)+1] = "G")
-          (pVarN[length(pVarN)+1] = (dddf[4,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-      }
-    }
-    
-  }
-  
-  rb<-data.frame(sVarN, VarN, refN, pVarN)
-  return(rb)
-}
 
-dvariant2000r<-function(ddf, pc){
-  
-  VarN<-c()
-  refN<-c()
-  pVarN<-c()
-  sVarN<-c()
-  
-  dddf<-read.csv(ddf)
-  lth = length(dddf)
-  
-  for(i in 3: lth){
-    
-    if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) {
-      
-      tcc = sum(dddf[1,i] + dddf[2,i] + dddf[3,i] + dddf[4,i])  #total counts
-      tccpc = tcc*pc  #least counts we are interested in
-      tccpcp = tcc*(1-pc) #maximum count of a putative consensus when minor population exits
-      
-      mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
-      
-      if ((mm < tccpcp) & (tcc > 2000)){
-        
-        aamatrix=c("A","T","C","G")
-        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
-        
-        ii = i-2  
-        
-        if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
-          (VarN[length(VarN)+1] = "A")
-          (pVarN[length(pVarN)+1] = (dddf[1,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-        
-        if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
-          (VarN[length(VarN)+1] = "T")
-          (pVarN[length(pVarN)+1] = (dddf[2,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-        
-        if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
-          (VarN[length(VarN)+1] = "C")
-          (pVarN[length(pVarN)+1] = (dddf[3,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-        
-        if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
-          (VarN[length(VarN)+1] = "G")
-          (pVarN[length(pVarN)+1] = (dddf[4,i]/tcc))
-          (sVarN[length(sVarN)+1] = (ii))
-          (refN[length(refN)+1] = aamatrix[nmax])}
-      }
-    }
-    
-  }
-  
-  rb<-data.frame(sVarN, VarN, refN, pVarN)
-  return(rb)
-}
-
-#2.3 Group detection of dvariant
+#2.2 Group detection of dvariant
 #ls = list of csvfile
 #pc = percentage of curring poing
 #nr = number of reads as threshold: 0 = origin, 1 = 1000, 2 = 2000
 
 lsvariant<-function(ls, pc, nr){
 
-#dvariant
-  if( nr == 0 ){    
     for (i in 1:length(ls)){
     
-    assign(paste0("sdf",".",i), dvariant(ls[i], pc)) #dataframe of sample
+    assign(paste0("sdf",".",i), dvariant(ls[i], pc, nr)) #dataframe of sample
     print((i/length(ls)*100))
   }
-    }
-
-#dvariant1000  
-  if( nr == 1  ){    
-    for (i in 1:length(ls)){
-      
-      assign(paste0("sdf",".",i), dvariant1000r(ls[i], pc)) #dataframe of sample
-      print((i/length(ls)*100))
-    }
-  }
   
-#dvariant2000  
-  if( nr == 2   ){    
-    for (i in 1:length(ls)){
-      
-      assign(paste0("sdf",".",i), dvariant2000r(ls[i], pc)) #dataframe of sample
-      print((i/length(ls)*100))
-    }
-  }
-  
-      
     plist<-mget(paste0("sdf.",1:length(ls)))
     lldvar<-do.call("rbind", plist)
     
   return(lldvar)
 }
 
-#3 nonsynonymous mutation 
+#3 nonsynonymous mutation --------------------------------------------
 #dvdf = dataframe generated by #4 dvariant 
 #ls = csvfile list
 nsvariant<-function(dvdf, ls){
@@ -406,33 +267,11 @@ print((i/dim(dvdf)[1])*100)
 
 lsvariantNS<-function(ls, pc, nr){
   
-  #dvariant
-  if( nr  == 0 ){    
     for (i in 1:length(ls)){
       
-      assign(paste0("sdf",".",i), dvariant(ls[i], pc)) #dataframe of sample
+      assign(paste0("sdf",".",i), dvariant(ls[i], pc, nr)) #dataframe of sample
       print((i/length(ls)*100))
     }
-  }
-  
-  #dvariant1000  
-  if( nr == 1  ){    
-    for (i in 1:length(ls)){
-      
-      assign(paste0("sdf",".",i), dvariant1000r(ls[i], pc)) #dataframe of sample
-      print((i/length(ls)*100))
-    }
-  }
-  
-  #dvariant2000  
-  if( nr == 2   ){    
-    for (i in 1:length(ls)){
-      
-      assign(paste0("sdf",".",i), dvariant2000r(ls[i], pc)) #dataframe of sample
-      print((i/length(ls)*100))
-    }
-  }
-  
   
   plist<-mget(paste0("sdf.",1:length(ls)))
   lldvar<-do.call("rbind", plist)
@@ -442,6 +281,81 @@ lsvariantNS<-function(ls, pc, nr){
   
   return(ffls)
 }
+
+
+#3.3 count only (for individual file)
+
+cdvariant(ddf, pc, nr){
+  
+  dcount=c()
+  
+  dddf<-read.csv(ddf)
+  lth = length(dddf)
+  
+  for(i in 3: lth){
+    
+    if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) {
+      
+      tcc = sum(dddf[1,i] + dddf[2,i] + dddf[3,i] + dddf[4,i])  #total counts
+      tccpc = tcc*pc  #least counts we are interested in
+      tccpcp = tcc*(1-pc) #maximum count of a putative consensus when minor population exits
+      
+      mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
+      
+      if (mm < tccpcp){
+        
+        aamatrix=c("A","T","C","G")
+        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
+        
+        ii = i-2  
+        
+        if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
+          (VarN[length(VarN)+1] = "A")
+          (pVarN[length(pVarN)+1] = (dddf[1,i]/tcc))
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[nmax])}
+        
+        if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
+          (VarN[length(VarN)+1] = "T")
+          (pVarN[length(pVarN)+1] = (dddf[2,i]/tcc))
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[nmax])}
+        
+        if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
+          (VarN[length(VarN)+1] = "C")
+          (pVarN[length(pVarN)+1] = (dddf[3,i]/tcc))
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[nmax])}
+        
+        if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
+          (VarN[length(VarN)+1] = "G")
+          (pVarN[length(pVarN)+1] = (dddf[4,i]/tcc))
+          (sVarN[length(sVarN)+1] = (ii))
+          (refN[length(refN)+1] = aamatrix[nmax])}
+      }
+    }
+    
+  }
+  
+  rb<-data.frame(sVarN, VarN, refN, pVarN)
+  return(rb)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+
+
+
+
+
+
+
 
 
 
