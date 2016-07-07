@@ -427,7 +427,7 @@ mdbp<-function(ddf, ddg, nr){
       nmaxg = which.max(c(dddg[1,i], dddg[2,i], dddg[3,i], dddg[4,i]))
       
       
-      if ((nmax != nmaxg) & ((tcc & tccg) >= nrv[nr])){
+      if ((nmax != nmaxg) & ( min(tcc, tccg) >= nrv[nr])){
         
         aamatrix=c("A","T","C","G")
         
