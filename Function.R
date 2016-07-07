@@ -423,18 +423,19 @@ mdbp<-function(ddf, ddg, nr){
       mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
       mmg = max(dddg[1,i], dddg[2,i], dddg[3,i], dddg[4,i]) #maximum counts (count of consensus seq)
       
-      if ((mm != mmg) & ((tcc & tccg) >= nrv[nr])){
+      nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
+      nmaxg = which.max(c(dddg[1,i], dddg[2,i], dddg[3,i], dddg[4,i]))
+      
+      
+      if ((nmax != nmaxg) & ((tcc & tccg) >= nrv[nr])){
         
         aamatrix=c("A","T","C","G")
-        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
-        nmaxg = which.max(c(dddg[1,i], dddg[2,i], dddg[3,i], dddg[4,i]))
-        
         
         ii = i-2  
 
         sVarN[length(sVarN)+1] = (ii)
         N1[length(N1)+1] = aamatrix[nmax]
-        N2[length(N1)+1] = aamatrix[nmaxg]
+        N2[length(N2)+1] = aamatrix[nmaxg]
         
         
         }
@@ -457,7 +458,7 @@ lsmdbp<-function(ls, lss, nr){  #fist list and second list
     print((i/length(ls)*100))
   }
   
-  plist<-mget(paste0("pdf",1:length(ls)))
+  plist<-mget(paste0("pdf.",1:length(ls)))
   lldvar<-do.call("rbind", plist)
   
   
