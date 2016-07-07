@@ -397,7 +397,73 @@ cdvariant<-function(ddf, pc, nr){
 
 
 
+#4 main sequences differences between paired sample (Main-Difference-between-Paired)
 
+mdbp<-function(ddf, ddg, nr){
+  
+  sVarN<-c()
+  N1<-c()
+  N2<-c()
+  
+  nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
+  
+  dddf<-read.csv(ddf)
+  dddg<-read.csv(ddg)
+  
+  lth = length(dddf)
+  
+  for(i in 3: lth){
+    
+    if ( ( (dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) 
+      & ( (dddg[1,i] | dddg[2,i] | dddg[3,i] | dddg[4,i] | dddg[5,i]) != 0 ) ) {
+    
+      tcc = sum(dddf[1,i] + dddf[2,i] + dddf[3,i] + dddf[4,i])  #total counts
+      tccg = sum(dddg[1,i] + dddg[2,i] + dddg[3,i] + dddg[4,i])  #total counts
+      
+      mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
+      mmg = max(dddg[1,i], dddg[2,i], dddg[3,i], dddg[4,i]) #maximum counts (count of consensus seq)
+      
+      if ((mm != mmg) & ((tcc & tccg) >= nrv[nr])){
+        
+        aamatrix=c("A","T","C","G")
+        nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
+        nmaxg = which.max(c(dddg[1,i], dddg[2,i], dddg[3,i], dddg[4,i]))
+        
+        
+        ii = i-2  
+
+        sVarN[length(sVarN)+1] = (ii)
+        N1[length(N1)+1] = aamatrix[nmax]
+        N2[length(N1)+1] = aamatrix[nmaxg]
+        
+        
+        }
+    }
+    
+  }
+  
+  rb<-data.frame(sVarN, N1, N2)
+  return(rb)
+} #ddf = fist file; ddg = second file
+
+
+#4.2 listed
+
+lsmdbp<-function(ls, lss, nr){  #fist list and second list
+  
+  for (i in 1:length(ls)){
+    
+    assign(paste0("pdf",".",i), mdbp(ls[i], lss[i], nr)) #dataframe of sample
+    print((i/length(ls)*100))
+  }
+  
+  plist<-mget(paste0("pdf",1:length(ls)))
+  lldvar<-do.call("rbind", plist)
+  
+  
+  return(lldvar)
+  
+}
 
 
 
