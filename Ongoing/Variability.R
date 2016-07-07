@@ -23,7 +23,7 @@ rmSUM.c <- strsplit(rmSUM, split="_", fixed = T) #cut by "-"
 lsfull.NO <- sapply(rmSUM.c, function(x) head(x,1))           #all sample numbering
 
 
-### -----
+### ----- pooled
 #syn.r1000.table0605
 
 for (i in 1:4){
@@ -75,21 +75,97 @@ for(i in 2: length(lsfull.NO)){
 }
 
 
+#### use cdvariant ------------------
+
+for (k in 1:4){
+  
+  v=c(0.05, 0.1, 0.2, 0.25)
+
+  mx = c(0,0,0,0,0,0,0,0)
+  for (i in 1:length(pairedS.No)){
+    
+    ii = pairedS.No[i]
+    iii = ii + 1
+    
+    a = cdvariant(lsfull[ii], v[k], 3) #3 = 1000
+    b = cdvariant(lsfull[iii], v[k], 3)
+    c = c (a[1], b[1], a[2], b[2], a[3], b[3], a[4], b[4])
+    
+    mx = rbind(mx, c)
+    
+    print(i/length(pairedS.No)*100)
+  }
+  
+  mx<-mx[-1,]
+  rownames(mx) <- c(1:length(pairedS.No))
+  assign(paste0("outlsv.paired.1000r.", v[k]), mx)
+
+}
+
+#outlsv.paired.1000r.0.05
+#outlsv.paired.1000r.0.1
+#outlsv.paired.1000r.0.2
+#outlsv.paired.1000r.0.25
+
+
+a = melt(cbind(outlsv.paired.1000r.0.2[,3], outlsv.paired.1000r.0.2[,4]))
+library(ggplot2)
+
+ggplot(data=a, aes(x=Var2, y=value, group=Var1, color=Var1)) + geom_line()
+
+
+# Pirate plot
+
+install.packages("devtools")
+library("devtools")
+install_github("ndphillips/yarrr")
+library(yarrr)
+
+pirateplot(formula = value ~ Var2, data = a, theme.o = 3, main="0.05")
+
+
+## conventional one ------------------
+
+
 for (i in 1:4){
   
   a=c(0.05, 0.1, 0.2, 0.25)
   
-  assign(paste0("outlsv.pC0.1000r",a[i]), lsvariantNS(lsfull[pairedS.No], a[i], 1))
-  assign(paste0("outlsv.pC1.1000r",a[i]), lsvariantNS(lsfull[pairedS.No + 1], a[i], 1))
+  assign(paste0("outlsv.pC0.1000r",a[i]), lsvariantNS(lsfull[pairedS.No], a[i], 3))
+  assign(paste0("outlsv.pC1.1000r",a[i]), lsvariantNS(lsfull[pairedS.No + 1], a[i], 3))
 }
 
 
+n1 = c("outlsv.pC0.1000r0.05", "outlsv.pC0.1000r0.1", "outlsv.pC0.1000r0.2", "outlsv.pC0.1000r0.25")
+n2 = c("outlsv.pC1.1000r0.05", "outlsv.pC1.1000r0.1", "outlsv.pC1.1000r0.2", "outlsv.pC1.1000r0.25")
+
+nn1=c()
+nn2=c() 
+aa1=c()
+aa2=c()
+for (i in 1:4){
+  nn1[length(nn1)+1] = dim(get(n1[i]))[1]
+  nn2[length(nn2)+1] = dim(get(n2[i]))[1]
+  aa1[length(aa1)+1] = length(which(get(n1[i]) == "TRUE"))
+  aa2[length(aa2)+1] = length(which(get(n2[i]) == "TRUE"))}
+
+
+nn1n=nn1/65
+nn2n=nn2/65
+aa1n=aa1/65
+aa2n=aa2/65
+
+
+a<-cbind(nn1, nn2, nn1n, nn2n, aa1, aa2, aa1n, aa2n)  #r1000.paired.table0607am12 = a
+rownames(a)=c(0.05, 0.1, 0.2, 0.25)
+colnames(a)=c("C0", "C1", "%", "%", "aC0", "aC1", "a%", "a%") 
+
+
+#2 Repeated sample
 
 
 
 
 
-#2 Variant sites by region
+#4 DF/ DHF + unset date
 
-
-#2.1 Variants by sites
