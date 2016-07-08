@@ -75,6 +75,15 @@ for(i in 2: length(lsfull.NO)){
 }
 
 
+### test for consensus sequence
+#pairedS.Nom <- pairedS.No[1:64]
+
+b=pairedS.No + 1
+a<-lsmdbp(lsfull[pairedS.Nom], lsfull[pairedS.Nom + 1], 2) #table.mdbp.r500.0708am02 = a
+                                                           #table.mdbp.r500.0708pm03 = a
+
+
+
 #### use cdvariant ------------------
 
 for (k in 1:4){
@@ -87,8 +96,8 @@ for (k in 1:4){
     ii = pairedS.No[i]
     iii = ii + 1
     
-    a = cdvariant(lsfull[ii], v[k], 3) #3 = 1000
-    b = cdvariant(lsfull[iii], v[k], 3)
+    a = cdvariant(lsfull[ii], v[k], 2) #2 = 500
+    b = cdvariant(lsfull[iii], v[k], 2)
     c = c (a[1], b[1], a[2], b[2], a[3], b[3], a[4], b[4])
     
     mx = rbind(mx, c)
@@ -98,7 +107,7 @@ for (k in 1:4){
   
   mx<-mx[-1,]
   rownames(mx) <- c(1:length(pairedS.No))
-  assign(paste0("outlsv.paired.1000r.", v[k]), mx)
+  assign(paste0("outlsv.paired.500r.", v[k]), mx)
 
 }
 
@@ -108,21 +117,40 @@ for (k in 1:4){
 #outlsv.paired.1000r.0.25
 
 
-a = melt(cbind(outlsv.paired.1000r.0.2[,3], outlsv.paired.1000r.0.2[,4]))
+
+a = melt(cbind(outlsv.paired.500r.0.05[,1], outlsv.paired.500r.0.05[,2], 
+               outlsv.paired.500r.0.1[,1], outlsv.paired.500r.0.1[,2],
+               outlsv.paired.500r.0.2[,1], outlsv.paired.500r.0.2[,2],
+               outlsv.paired.500r.0.25[,1], outlsv.paired.500r.0.25[,2]))
+
+#cp 
+a[,4] = c(rep(0.05, 130), rep(0.1, 130), rep(0.2, 130), rep(0.25, 130))
+
+#type
+a[,5] = rep(c(rep("C0", 65), rep("C1", "65")), 4)
+names(a) = c("Var1", "Var2", "count", "Cutpoint", "Type")
+aa<-a[-(which(a$Var1== 65)),] #get rid of #65 pair
+
+
 library(ggplot2)
 
 ggplot(data=a, aes(x=Var2, y=value, group=Var1, color=Var1)) + geom_line()
 
 
-# Pirate plot
+# Pirate plot ----------
 
 install.packages("devtools")
 library("devtools")
 install_github("ndphillips/yarrr")
 library(yarrr)
 
-pirateplot(formula = value ~ Var2, data = a, theme.o = 3, main="0.05")
+#500 r
+p=pirateplot(formula = count ~ Type + Cutpoint, data = a, theme.o = 3, 
+           main="Comparison of paired samples", inf = "ci",
+           ylab="No. of position with variants", gl.col = gray(.8),
+           pal="basel")
 
+box(which = "p")
 
 ## conventional one ------------------
 
