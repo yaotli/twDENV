@@ -409,12 +409,11 @@ pvariant<-function(ls, b, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant
     
     dddf<-read.csv(ls[k])
     lth = length(dddf)
+    sitecount = c()
+    sitecountaa = c()
+    
     
     for(i in 3: lth){ #each position
-      
-      sitecount = c(0,0)
-      sitecountaa = c(0,0)
-      
       
       if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) { 
         
@@ -431,64 +430,41 @@ pvariant<-function(ls, b, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant
            
             if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
                 
-              sitecount[length(sitecount) +1 ] = k
               sitecount[length(sitecount) +1 ] = ii
               
                   if (((nsvariantsite(ls[k],ii,nmax,1)) == "TRUE") & (kd > 2)){ 
                 
-                    sitecountaa[length(sitecountaa) +1 ] = k
                     sitecountaa[length(sitecountaa) +1 ] = ii
               } } #A
             
             if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
                 
-                sitecount[length(sitecount) +1 ] = k
                 sitecount[length(sitecount) +1 ] = ii
                 
                 if (((nsvariantsite(ls[k],ii,nmax,2)) == "TRUE") & (kd > 2)){ 
                   
-                  sitecountaa[length(sitecountaa) +1 ] = k
                   sitecountaa[length(sitecountaa) +1 ] = ii
                 } } #T
               
             if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
                   
-                  sitecount[length(sitecount) +1 ] = k
                   sitecount[length(sitecount) +1 ] = ii
                   
                 if (((nsvariantsite(ls[k],ii,nmax,3)) == "TRUE") & (kd > 2)){ 
                     
-                    sitecountaa[length(sitecountaa) +1 ] = k
                     sitecountaa[length(sitecountaa) +1 ] = ii
                   } } #C
              
             if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
                     
-                    sitecount[length(sitecount) +1 ] = k
                     sitecount[length(sitecount) +1 ] = ii
                     
                  if (((nsvariantsite(ls[k],ii,nmax,4)) == "TRUE") & (kd > 2)){ 
                       
-                      sitecountaa[length(sitecountaa) +1 ] = k
                       sitecountaa[length(sitecountaa) +1 ] = ii
                     }   } #G       
         
            
-          if(kd == 1){
-            sitecount<-matrix(sitecount, ncol = 2, byrow = TRUE)
-            sitecount=sitecount[which(duplicated(sitecount[,2]) != TRUE),]
-            mx=rbind(mx,sitecount) }
-          if(kd == 2){
-            sitecount<-matrix(sitecount, ncol = 2, byrow = TRUE)
-            mx=rbind(mx,sitecount) }
-          if(kd == 3){
-            sitecountaa<-matrix(sitecountaa, ncol = 2, byrow = TRUE)
-            sitecountaa=sitecountaa[which(duplicated(sitecountaa[,2]) != TRUE),]
-            mx=rbind(mx,sitecountaa) }
-          if(kd == 4){
-            sitecountaa<-matrix(sitecountaa, ncol = 2, byrow = TRUE)
-            mx=rbind(mx,sitecountaa) }  
-          
           
         }
 
@@ -500,16 +476,38 @@ pvariant<-function(ls, b, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant
       
       }
 
+    if(kd == 1){
+      sitecount=unique(sitecount)
+      region<-cut(sitecount, b, right = FALSE)
+      region<-data.frame(k, table(region))
+      
+      mx=rbind(mx,region) }
+    
+    if(kd == 2){
+      region<-cut(sitecount, b, right = FALSE)
+      region<-data.frame(k, table(region))
+      
+      mx=rbind(mx,region) }
+    
+    if(kd == 3){
+      sitecountaa=unique(sitecountaa)
+      region<-cut(sitecountaa, b, right = FALSE)
+      region<-data.frame(k, table(region))
+      
+      mx=rbind(mx,region)}
+    
+    if(kd == 4){      
+      region<-cut(sitecountaa, b, right = FALSE)
+      region<-data.frame(k, table(region))
+    
+      mx=rbind(mx,region) }  
 
- print((k/length(ls))*100)
+    print((k/length(ls))*100)
     
   }
 
-fullcut<-cut(mx[,2], b, right = FALSE)
-mxx=data.frame(mx,fullcut)
-mxx=mxx[which(mxx[,1] != 0), ]
 
-return(mxx)    
+return(mx)    
 
 }
 
