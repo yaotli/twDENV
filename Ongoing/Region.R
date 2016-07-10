@@ -14,25 +14,38 @@ ticks<-outreg.15.r1000.0.05.ps$region[1:300]
 ticksss<-ticks[seq(5,295, by=10)] #length(ticksss)
 ticklab<-seq(950, 2400, by=50)
 
-outreg.0102.r1000.0.05.ps = pvariant(lsfull.C0m.0102, breaks, 0.05, 3, 1)
-outreg.0102.r1000.0.05.pns = pvariant(lsfull.C0m.0102, breaks, 0.05, 3, 3)
-outreg.15.r1000.0.05.ps = pvariant(lsfull.C0m.15, breaks, 0.05, 3, 1)
-outreg.15.r1000.0.05.pns = pvariant(lsfull.C0m.15, breaks, 0.05, 3, 3)
+outreg.0102.r1000.0.05.vs = pvariant(lsfull.C0m.0102, breaks, 0.05, 3, 2)
+outreg.0102.r1000.0.05.vns = pvariant(lsfull.C0m.0102, breaks, 0.05, 3, 4)
+outreg.15.r1000.0.05.vs = pvariant(lsfull.C0m.15, breaks, 0.05, 3, 2)
+outreg.15.r1000.0.05.vns = pvariant(lsfull.C0m.15, breaks, 0.05, 3, 4)
 
 #heatmap
 library(ggplot2)
 
 
-hp = ggplot(outreg.15.r1000.0.05.pns, aes(region, k)) + geom_tile(aes(fill=Freq), colour="white") + 
+hp = ggplot(outreg.15.r1000.0.05.vns, aes(region, k)) + geom_tile(aes(fill=Freq), colour="white") + 
             
-            scale_fill_gradient(low="white", high="blue") + 
+            scale_fill_gradient(low="white", high="Blue") + 
   
             theme(axis.text.x=element_text(angle=90, vjust = 0.5)) + xlab("") + ylab("Sample") +
   
             scale_x_discrete(breaks=ticksss, labels=ticklab)
 
-
-
+#################################
+# outreg.0102.r1000.0.05.ps
+# outreg.15.r1000.0.05.ps
+# outreg.0102.r1000.0.05.pns
+# outreg.15.r1000.0.05.pns
+# 
+# outreg.0102.r1000.0.01.ps
+# outreg.15.r1000.0.01.ps
+# outreg.0102.r1000.0.01.pns
+# outreg.15.r1000.0.01.pns
+#
+# outreg.0102.r1000.0.05.vs
+# outreg.15.r1000.0.05.vs
+# outreg.0102.r1000.0.05.vns
+# outreg.15.r1000.0.05.vns
 
 
 
