@@ -625,9 +625,38 @@ conSUM<-function(ls, nr){
    return(mx)
 }
 
+##6 extract 2nd last variant (%) -------------------------------------- 
 
 
+sndvariantp<-function(ls, nr){
+  
+  pVarN<-c()
 
-
+  nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
+  
+  for(k in 1: length(ls)){ #file
+    
+    dddf<-read.csv(ls[k])
+    lth = length(dddf)
+    
+    for(i in 3: lth){
+      
+      tcc = sum(dddf[1,i] + dddf[2,i] + dddf[3,i] + dddf[4,i])  #total counts
+      
+      if (((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) & 
+          (tcc >= nrv[nr])) {
+        
+        a=c(dddf[1,i], dddf[2,i], dddf[3,i],dddf[4,i])
+        
+        pVarN[length(pVarN) +1 ] = (sort(a, decreasing = TRUE)[2]/tcc)
+      
+        }
+      }
+     
+     print((k/length(ls))*100)
+    }
+   return(pVarN) 
+    
+  }
 
 
