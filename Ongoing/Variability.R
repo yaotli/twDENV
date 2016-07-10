@@ -79,10 +79,28 @@ for(i in 2: length(lsfull.NO)){
 #pairedS.Nom <- pairedS.No[1:64]
 
 b=pairedS.No + 1
-a<-lsmdbp(lsfull[pairedS.Nom], lsfull[pairedS.Nom + 1], 2) #table.mdbp.r500.0708am02 = a
-                                                           #table.mdbp.r500.0708pm03 = a
+a<-lsmdbp(lsfull[pairedS.Nom], lsfull[pairedS.Nom + 1], 2) # table.mdbp.r500.0708am02 = a
+                                                           # table.mdbp.r500.0708pm03 = a
 
-
+### ---- deal with table of consensus change between pairs # table.mdbp.r500.0711am12
+  
+  a<-c(17, 18, 32, 38, 40, 40, 57, 57)
+  aa<-c(1,4,3,4,4,1,3,1)
+  aaa<-c(4,1,2,1,2,4,2,4)
+  
+  b=c()
+  bb=c()
+  bbb=c()
+for(i in 1: length(a)){
+  
+   ii = i+1
+   b[length(b)+1] = lsfull.NO[ pairedS.No [a[i]]]
+   bb[length(bb)+1] = pon(lsfull[pairedS.No[a[i]]], aa[i], table.mdbp.r500.0708pm03[,1][i])
+   bbb[length(bbb)+1] = pon(lsfull[pairedS.No[a[i]] + 1], aaa[i], table.mdbp.r500.0708pm03[,1][i])}
+  
+    t<-data.frame(b,table.mdbp.r500.0708pm03[,1], as.character(table.mdbp.r500.0708pm03[,2]), as.numeric(bb), 
+                  as.character(table.mdbp.r500.0708pm03[,3]), as.numeric(bbb), c("N", rep("S", 6), "N"))
+    colnames(t)=c("ID", "Position", "C0", "%", "C1", "%", "Type") # table.mdbp.r500.0711am12 = t
 
 #### use cdvariant ------------------
 
