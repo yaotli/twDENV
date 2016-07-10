@@ -82,7 +82,8 @@ b=pairedS.No + 1
 a<-lsmdbp(lsfull[pairedS.Nom], lsfull[pairedS.Nom + 1], 2) # table.mdbp.r500.0708am02 = a
                                                            # table.mdbp.r500.0708pm03 = a
 
-### ---- deal with table of consensus change between pairs # table.mdbp.r500.0711am12
+### ---- deal with table of consensus change between pairs ------- 
+                                                            # table.mdbp.r500.0711am12
   
   a<-c(17, 18, 32, 38, 40, 40, 57, 57)
   aa<-c(1,4,3,4,4,1,3,1)
@@ -133,8 +134,6 @@ for (k in 1:4){
 #outlsv.paired.1000r.0.1
 #outlsv.paired.1000r.0.2
 #outlsv.paired.1000r.0.25
-
-
 
 a = melt(cbind(outlsv.paired.500r.0.05[,1], outlsv.paired.500r.0.05[,2], 
                outlsv.paired.500r.0.1[,1], outlsv.paired.500r.0.1[,2],
@@ -207,11 +206,58 @@ rownames(a)=c(0.05, 0.1, 0.2, 0.25)
 colnames(a)=c("C0", "C1", "%", "%", "aC0", "aC1", "a%", "a%") 
 
 
-#2 Repeated sample
+#2 Onset date ----------------------
+
+for (k in 1:4){
+  
+  v=c(0.05, 0.1, 0.2)
+  
+  mx = c(0,0,0,0,0,0,0,0)
+  for (i in 1:length(pairedS.No)){
+    
+    ii = pairedS.No[i]
+    iii = ii + 1
+    
+    a = cdvariant(lsfull[ii], v[k], 2) #2 = 500
+    b = cdvariant(lsfull[iii], v[k], 2)
+    c = c (a[1], b[1], a[2], b[2], a[3], b[3], a[4], b[4])
+    
+    mx = rbind(mx, c)
+    
+    print(i/length(pairedS.No)*100)
+  }
+  
+  mx<-mx[-1,]
+  rownames(mx) <- c(1:length(pairedS.No))
+  assign(paste0("outlsv.paired.500r.", v[k]), mx)
+  
+}
 
 
 
 
 
-#4 DF/ DHF + unset date
+#4 DF/ DHF + unset date -----------
+
+########## examine the distribution of the 2nd most variant % in each position in all samples
+
+
+allsend.r0 = sndvariantp(lsfull, 1)
+allsend.r500 = sndvariantp(lsfull, 2)
+c=c(allsend.r0, allsend.r500)
+cc=c(rep(0, length(allsend.r0)), rep(500, length(allsend.r500)))
+
+a=data.frame(c, cc)
+
+p=pirateplot(formula = cc ~ c , data = a, theme.o = 3, 
+             main="", inf = "ci",
+             ylab="", gl.col = gray(.8),
+             pal="basel")
+
+box(which = "p")
+
+length(allsend.r500)
+
+ggplot(a, aes(cc, c)) + geom_jitter(alpha=I(1/4), aes(color=cc))
+
 
