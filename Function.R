@@ -648,7 +648,12 @@ sndvariantp<-function(ls, nr){
         
         a=c(dddf[1,i], dddf[2,i], dddf[3,i],dddf[4,i])
         
-        pVarN[length(pVarN) +1 ] = (sort(a, decreasing = TRUE)[2]/tcc)
+          if((sort(a, decreasing = TRUE)[2]/tcc) != 0){
+            
+            pVarN[length(pVarN) +1 ] = (sort(a, decreasing = TRUE)[2]/tcc)
+            
+          } 
+        
       
         }
       }
