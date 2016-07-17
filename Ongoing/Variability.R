@@ -4,9 +4,9 @@ lsfull <- c(list.files(getwd())[213:221], list.files(getwd())[1:212])
 ls0102 <- c(list.files(getwd())[213:221], list.files(getwd())[1:129])
 ls05 <- c(list.files(getwd())[130:212])
 
-#1 C0 sample vs C1 ----------------------------------------------------
+################ 1 C0 sample vs C1 ----------------------------------------------------
 
-# "ALL" C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25)
+#### "ALL" C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25)
 
 lsfull.c <- strsplit(lsfull, split="-", fixed = T) #cut by "-"
 cstatus <- sapply(lsfull.c, function(x) length(x) == 1 )
@@ -23,7 +23,7 @@ rmSUM.c <- strsplit(rmSUM, split="_", fixed = T) #cut by "-"
 lsfull.NO <- sapply(rmSUM.c, function(x) head(x,1))           #all sample numbering
 
 
-### ----- pooled
+### pooled ----- 
 #syn.r1000.table0605
 
 for (i in 1:4){
@@ -61,7 +61,7 @@ colnames(a)=c("C0", "C1", "%", "%", "aC0", "aC1", "a%", "a%")
 
 
 
-# paired C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25) ------------------------
+### paired C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25) ------------------------
 
 pairedS.No <- c()                                             #all number of paired C0 #n = 65
 for(i in 2: length(lsfull.NO)){
@@ -103,7 +103,7 @@ for(i in 1: length(a)){
                   as.character(table.mdbp.r500.0708pm03[,3]), as.numeric(bbb), c("N", rep("S", 6), "N"))
     colnames(t)=c("ID", "Position", "C0", "%", "C1", "%", "Type") # table.mdbp.r500.0711am12 = t
 
-#### use cdvariant ------------------
+#### use cdvariant ( for pirateplot )------------------
 
 for (k in 1:4){
   
@@ -206,58 +206,70 @@ rownames(a)=c(0.05, 0.1, 0.2, 0.25)
 colnames(a)=c("C0", "C1", "%", "%", "aC0", "aC1", "a%", "a%") 
 
 
-#2 Onset date ----------------------
+################ 2 Onset date ----------------------------------------------------
 
-for (k in 1:4){
+for (k in 1:3){
   
-  v=c(0.05, 0.1, 0.2)
+  v=c(0.016, 0.02, 0.025)
   
-  mx = c(0,0,0,0,0,0,0,0)
-  for (i in 1:length(pairedS.No)){
+  mx = c(0,0,0,0)
+  for (i in 1:length(lsfullm)){
     
-    ii = pairedS.No[i]
-    iii = ii + 1
+
+    a = cdvariant(lsfullm, v[k], 3) #3 = 1000
     
-    a = cdvariant(lsfull[ii], v[k], 2) #2 = 500
-    b = cdvariant(lsfull[iii], v[k], 2)
-    c = c (a[1], b[1], a[2], b[2], a[3], b[3], a[4], b[4])
+    mx = rbind(mx, a)
     
-    mx = rbind(mx, c)
-    
-    print(i/length(pairedS.No)*100)
+    print(i/length(lsfullm)*100)
   }
   
   mx<-mx[-1,]
-  rownames(mx) <- c(1:length(pairedS.No))
-  assign(paste0("outlsv.paired.500r.", v[k]), mx)
+  rownames(mx) <- c(1:length(lsfullm[1:2]))
+  assign(paste0("out.lscd.all.1000r.", v[k]), mx)
   
 }
 
 
-
-
-
-#4 DF/ DHF + unset date -----------
-
 ########## examine the distribution of the 2nd most variant % in each position in all samples
 
 
-allsend.r0 = sndvariantp(lsfull, 1)
-allsend.r500 = sndvariantp(lsfull, 2)
-c=c(allsend.r0, allsend.r500)
-cc=c(rep(0, length(allsend.r0)), rep(500, length(allsend.r500)))
+  allsend.r0 = sndvariantp(lsfull, 1) # max(allsend.r0)  
+  allsend.r500 = sndvariantp(lsfull, 2) # max(allsend.r500) 
+  c=c(allsend.r0, allsend.r500)
+  cc=c(rep("0", length(allsend.r0)), rep("500", length(allsend.r500)))
+  a=data.frame(c, cc) 
+  names(a) = c("position", "reads")
+  
+  aa=data.frame(allsend.r500, rep(500, length(allsend.r500)))
+  names(aa) = c("position", "reads")
+  
 
-a=data.frame(c, cc)
+#dis
+  p<-ggplot(a, aes(position, fill = reads)) + geom_density(alpha = 0.2)
+  
+  
+#jitter
+  j=ggplot(a, aes(reads, position)) + geom_jitter(alpha=I(1/4), aes(color=position))
 
-p=pirateplot(formula = cc ~ c , data = a, theme.o = 3, 
-             main="", inf = "ci",
-             ylab="", gl.col = gray(.8),
-             pal="basel")
+  #pirate  
+  library(yarrr)
+  p=pirateplot(formula = position ~ reads , data = aa, theme.o = 3, 
+               main="", inf = "ci",
+               ylab="", gl.col = gray(.8),
+               pal="basel")
+  
+  box(which = "p")
+#box  
+  b=ggplot(a, aes(reads, position, fill=reads)) + geom_boxplot(aes(fill=reads)) + ylab("Position") +
+            theme(legend.position = "none") + ylim(0,0.05)
 
-box(which = "p")
-
-length(allsend.r500)
-
-ggplot(a, aes(cc, c)) + geom_jitter(alpha=I(1/4), aes(color=cc))
-
-
+#t.test for CI
+  
+  t.test(allsend.r0) # mean = 0.01565829 CI = 0.01555479, 0.01576180 
+  t.test(allsend.r500) # mean = 0.01418616 CI = 0.01410864, 0.01426368
+  
+  sd(allsend.r0) 
+  0.01565829 + 2.58*(  sd(allsend.r0) )/sqrt(length(allsend.r0)) #set to 99%
+  
+  
+  
