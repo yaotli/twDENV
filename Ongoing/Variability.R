@@ -14,6 +14,7 @@ cstatus <- gsub("TRUE", replacement = "C0", cstatus)
 cstatus <- gsub("FALSE", replacement = "C1", cstatus)         #all C status
 
 lsfull.C0 <- lsfull[which(cstatus == "C0")] #n = 151
+lsfull.C0m = lsfull.C0[-103]
 lsfull.C1 <- lsfull[which(cstatus == "C1")] #n = 70
 
 
@@ -21,7 +22,9 @@ rmSUM <-gsub("SUM", replacement = "", lsfull)
 rmSUM.c <- strsplit(rmSUM, split="_", fixed = T) #cut by "-"
 
 lsfull.NO <- sapply(rmSUM.c, function(x) head(x,1))           #all sample numbering
+lsfull.NOm <- lsfull.NO[-171]                                 #remove problematic #5083
 
+write.csv(lsfull.C0m, "full.csv")
 
 ### pooled ----- 
 #syn.r1000.table0605
@@ -216,7 +219,7 @@ for (k in 1:3){
   for (i in 1:length(lsfullm)){
     
 
-    a = cdvariant(lsfullm, v[k], 3) #3 = 1000
+    a = cdvariant(lsfullm[i], v[k], 3) #3 = 1000
     
     mx = rbind(mx, a)
     
@@ -224,10 +227,66 @@ for (k in 1:3){
   }
   
   mx<-mx[-1,]
-  rownames(mx) <- c(1:length(lsfullm[1:2]))
+  rownames(mx) <- c(1:length(lsfullm))
   assign(paste0("out.lscd.all.1000r.", v[k]), mx)
   
 }
+
+# out.lscd.all.1000r.0.016
+# out.lscd.all.1000r.0.02
+# out.lscd.all.1000r.0.025
+
+### add with demo data
+
+t.demo<-read.csv(file.choose()) #from DEMO.csv
+t.demo$TpIllness<-factor(t.demo$TpIllness, levels = c(".",0,1,2,3,4,5,6,7,8,14))
+  
+Period<-c(rep("01-03", 77), rep("15", 73))
+
+t.0.025<-data.frame(out.lscd.all.1000r.0.025[which(cstatus[-171] == "C0"),], t.demo, Period)
+
+# t.0.016
+# t.0.02
+# t.0.025
+
+library(dplyr)
+t.0.025m = 
+  t.0.025 %>%
+  filter(TpIllness != '.') %>%
+  select(X1, TpIllness, Period)
+
+# t.0.016m
+# t.0.02m
+# t.0.025m
+
+##boxplot
+ggplot(t.0.025m, aes(x=TpIllness,y=X1, fill=TpIllness)) + geom_boxplot() + ylab("") + 
+  facet_wrap(~ Period) + theme(legend.position="none")
+
+
+##pirate
+pirateplot(formula = X1 ~ TpIllness + Period, data = t.0.025m, theme.o = 3, 
+             main="Date of Sampling post Onset of Illness",inf = "ci",
+             ylab="No. of position with variants", gl.col = gray(.8),
+             pal="basel")
+
+box(which = "p")
+
+
+
+##error bar 
+
+#function: data_summary (http://www.sthda.com/english/wiki/
+#                       ggplot2-error-bars-quick-start-guide-r-software-and-data-visualization)
+
+b=data_summary(t.0.025m, varname = "X1", groupnames = c("TpIllness", "Period"))
+
+
+
+b3=ggplot(b, aes(x=TpIllness, y=X1, colour=Period)) + 
+  geom_errorbar(aes(ymin=X1-sd, ymax=X1+sd), width=.1) +
+  geom_line() +
+  geom_point() + facet_wrap(~ Period)
 
 
 ########## examine the distribution of the 2nd most variant % in each position in all samples
