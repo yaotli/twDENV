@@ -175,7 +175,7 @@ dvariant<-function(ddf, pc, nr){
 #2.2 Group detection of dvariant (lsvariant)
 #ls = list of csvfile
 #pc = percentage of curring poing
-#nr = number of reads as threshold: 0 = origin, 1 = 1000, 2 = 2000
+#nr = number of reads as threshold: 1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
 
 lsvariant<-function(ls, pc, nr){
 
@@ -397,7 +397,7 @@ cdvariant<-function(ddf, pc, nr){
 }
 
 
-#3.5 postion recognition
+#3.5 position recognition (for Heatmap)
 
 pvariant<-function(ls, b, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant, 
                                        #           3 = position of NS, 4 = variant of NS
@@ -509,6 +509,131 @@ pvariant<-function(ls, b, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant
 
 return(mx)    
 
+}
+
+
+#3.6 modified position recognition 
+
+
+pvariantM<-function(ls, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant, 
+  #           3 = position of NS, 4 = variant of NS
+  # b = breaks, ex: breaks = seq(930, 2430, by=30)
+  mx = c()
+  mxk = c()
+  nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
+  
+  for (k in 1:length(ls)){  #each file
+    
+    dddf<-read.csv(ls[k])
+    lth = length(dddf)
+    sitecount = c()
+    sitecountaa = c()
+    
+    
+    for(i in 3: lth){ #each position
+      
+      if ((dddf[1,i] | dddf[2,i] | dddf[3,i] | dddf[4,i] | dddf[5,i]) != 0 ) { 
+        
+        tcc = sum(dddf[1,i] + dddf[2,i] + dddf[3,i] + dddf[4,i])  #total counts
+        tccpc = tcc*pc  #least counts we are interested in
+        tccpcp = tcc*(1-pc) #maximum count of a putative consensus when minor population exits
+        
+        mm = max(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]) #maximum counts (count of consensus seq)
+        
+        if ((mm <= tccpcp) & (tcc >= nrv[nr])){
+          
+          nmax = which.max(c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i]))
+          ii = i-2
+          
+          if ((dddf[1,i] >= tccpc) & (dddf[1,i] != mm)){
+            
+            sitecount[length(sitecount) +1 ] = ii
+            
+            if (((nsvariantsite(ls[k],ii,nmax,1)) == "TRUE") & (kd > 2)){ 
+              
+              sitecountaa[length(sitecountaa) +1 ] = ii
+            } } #A
+          
+          if ((dddf[2,i] >= tccpc) & (dddf[2,i] != mm)){
+            
+            sitecount[length(sitecount) +1 ] = ii
+            
+            if (((nsvariantsite(ls[k],ii,nmax,2)) == "TRUE") & (kd > 2)){ 
+              
+              sitecountaa[length(sitecountaa) +1 ] = ii
+            } } #T
+          
+          if ((dddf[3,i] >= tccpc) & (dddf[3,i] != mm)){
+            
+            sitecount[length(sitecount) +1 ] = ii
+            
+            if (((nsvariantsite(ls[k],ii,nmax,3)) == "TRUE") & (kd > 2)){ 
+              
+              sitecountaa[length(sitecountaa) +1 ] = ii
+            } } #C
+          
+          if ((dddf[4,i] >= tccpc) & (dddf[4,i] != mm)){
+            
+            sitecount[length(sitecount) +1 ] = ii
+            
+            if (((nsvariantsite(ls[k],ii,nmax,4)) == "TRUE") & (kd > 2)){ 
+              
+              sitecountaa[length(sitecountaa) +1 ] = ii
+            }   } #G       
+          
+          
+          
+        }
+        
+        
+      }
+      
+      
+      
+      
+    }
+    
+    if(kd == 1){
+      sitecount=unique(sitecount)
+      
+      kk = c(rep(k, length(sitecount)))
+      mx = c(mx, sitecount)
+      mxk = c(mxk, kk)
+      
+      }
+    
+    if(kd == 2){
+      
+      kk = c(rep(k, length(sitecount)))
+      mx = c(mx, sitecount)
+      mxk = c(mxk, kk)
+      
+       }
+    
+    if(kd == 3){
+      sitecountaa=unique(sitecountaa)
+
+      kk = c(rep(k, length(sitecountaa)))
+      mx = c(mx, sitecountaa)
+      mxk = c(mxk, kk)
+      
+      }
+    
+    if(kd == 4){    
+      
+      kk = c(rep(k, length(sitecountaa)))
+      mx = c(mx, sitecountaa)
+      mxk = c(mxk, kk)
+       }  
+    
+    print((k/length(ls))*100)
+    
+  }
+  
+  mxx=data.frame(mx,mxk)
+  
+  return(mxx)    
+  
 }
 
 
