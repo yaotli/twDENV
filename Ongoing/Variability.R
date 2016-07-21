@@ -240,6 +240,7 @@ for (k in 1:3){
 
 t.demo<-read.csv(file.choose()) #from DEMO.csv
 t.demo$TpIllness<-factor(t.demo$TpIllness, levels = c(".",0,1,2,3,4,5,6,7,8,14))
+t.demo<-data.frame(c(1:150), t.demo)
   
 Period<-c(rep("01-03", 77), rep("15", 73))
 
@@ -250,6 +251,7 @@ t.0.025<-data.frame(out.lscd.all.1000r.0.025[which(cstatus[-171] == "C0"),], t.d
 # t.0.025
 
 library(dplyr)
+
 t.0.025m = 
   t.0.025 %>%
   filter(TpIllness != '.') %>%
@@ -331,4 +333,47 @@ b3=ggplot(b, aes(x=TpIllness, y=X1, colour=Period)) +
   0.01565829 + 2.58*(  sd(allsend.r0) )/sqrt(length(allsend.r0)) #set to 99%
   
   
+###########################################################################  
+################ 3 DHF ----------------------------------------------------
+  
+library(dplyr)  
+  
+t.0.025d =  
+    t.0.025 %>%
+    filter(DHF != ".") %>%
+      filter(Secondary != ".") %>%
+        select(X1, X3, DHF, Secondary, Period, TpIllness)
+  
+  
+#pirate
+
+    library(yarrr)
+    
+    a=pirateplot(formula = X1 ~ DHF + TpIllness, data = t.0.016d, theme.o = 3, 
+               main="",inf = "ci",
+               ylab="No. of position with variants", gl.col = gray(.8),
+               pal="basel")
+    
+    box(which = "p")
+    
+    
+#error bar
+    
+    library(ggplot2)
+    b=data_summary(t.0.016d, varname = "X1", groupnames = c("DHF"))
+    
+    b3=ggplot(b, aes(x=DHF, y=X1)) + 
+      geom_errorbar(aes(ymin=X1-sd, ymax=X1+sd), width=0.1,size=1.5) +
+      geom_line() +
+      geom_point(size=3)
+    
+
+###########################################################################  
+################ 4 Repeated Sample ----------------------------------------
+
+
+
+
+
+
   
