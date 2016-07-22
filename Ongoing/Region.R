@@ -81,13 +81,15 @@ hp = ggplot(outreg.df.r1000.0.02.vs, aes(region, k)) + geom_tile(aes(fill=Freq),
 multiplot(hp,hp2)
 
 
-
-###distribution
+##########################
+###distribution : variants 
 # ouls.df.r1000.0.02.vs
 # ouls.dhf.r1000.0.02.vs
 
 ouls.df.r1000.0.02.vs = lsvariantNS(ls.DF.c0, 0.02,3)
 ouls.dhf.r1000.0.02.vs = lsvariantNS(ls.DHF.c0, 0.02,3)
+
+##hist
 
 a=ouls.df.r1000.0.02.vs[,1]
 a=data.frame(a)
@@ -99,6 +101,8 @@ b=data.frame(b)
   
 multiplot(p1,p2)
   
+#normalized 
+
 aa=as.data.frame(table(a)/127)
 bb=as.data.frame(table(b)/22) 
 names(bb) = c("a", "Freq")
@@ -109,12 +113,55 @@ p2 = as.numeric(as.character(df$a))
 df = data.frame(df, p2, c(rep("DF",772), rep("DHF", 453)))
 names(df) = c("Position", "Freq", "Position2","DHF")
 
-ddf=df[1:500,]
-
   ggplot(df, aes(x=Position2, y=Freq)) + geom_line(aes(color=DHF), size=1.5) +
     xlab("Position") + ylab("Normalized count") + 
      scale_color_manual(values=c("#56B4E9", "#CC79A7"))  
     
+  
+###########################
+###distribution : position
+
+# outls.df.r1000.0.02.ps
+# outls.dhf.r1000.0.02.ps
+    
+outls.df.r1000.0.02.ps = pvariantM(ls.DF.c0, 0.02, 3, 1)
+outls.dhf.r1000.0.02.ps = pvariantM(ls.DHF.c0, 0.02, 3, 1)
+
+#his
+
+a=outls.df.r1000.0.02.ps[,1]
+a=data.frame(a)
+b=outls.dhf.r1000.0.02.ps[,1]
+b=data.frame(b)
+
+p1=ggplot(a,aes(a)) + geom_histogram(binwidth = 5) + xlim(c(950,2500)) + xlab("")
+p2=ggplot(b,aes(b)) + geom_histogram(binwidth = 5) + xlim(c(950,2500)) + xlab("")
+
+multiplot(p1,p2)
+
+
+#normalized 
+
+aa=as.data.frame(table(a)/127)
+bb=as.data.frame(table(b)/22) 
+names(bb) = c("a", "Freq")
+
+df = rbind(aa,bb)
+p2 = as.numeric(as.character(df$a))
+
+df = data.frame(df, p2, c(rep("DF",772), rep("DHF", 453)))
+names(df) = c("Position", "Freq", "Position2","DHF")
+
+
+ggplot(df, aes(x=Position2, y=Freq)) + geom_line(aes(color=DHF), size=1.5) +
+  xlab("Position") + ylab("Normalized count") + 
+  scale_color_manual(values=c("#56B4E9", "#CC79A7"))  
+
+
+
+
+
+  
   
   
   
