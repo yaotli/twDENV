@@ -371,9 +371,17 @@ t.0.025d =
 ###########################################################################  
 ################ 4 Repeated Sample ----------------------------------------
 
+library(dplyr)  
+ 
+t.0.016r =     
+t.0.016 %>%
+  filter(Repeated != ".") %>%
+    filter(Repeated != "Y") %>%
+      select(X1, X3, ID, Secondary, Repeated, Period, TpIllness, DHF)
+    
 
 
-
-
+ggplot(t.0.016r, aes(x=TpIllness, y=X3, color=Period, group=Repeated)) + geom_line(size=2) + 
+  geom_point() + facet_wrap(~ Repeated)
 
   
