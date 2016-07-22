@@ -240,7 +240,7 @@ for (k in 1:3){
 
 t.demo<-read.csv(file.choose()) #from DEMO.csv
 t.demo$TpIllness<-factor(t.demo$TpIllness, levels = c(".",0,1,2,3,4,5,6,7,8,14))
-t.demo<-data.frame(c(1:150), t.demo)
+t.demo<-data.frame(c(1:150), t.demo) #should have 150 C0
   
 Period<-c(rep("01-03", 77), rep("15", 73))
 
@@ -376,10 +376,12 @@ library(dplyr)
 t.0.016r =     
 t.0.016 %>%
   filter(Repeated != ".") %>%
-    filter(Repeated != "Y") %>%
+    filter(Repeated != "Y") %>% #revome DV2132
       select(X1, X3, ID, Secondary, Repeated, Period, TpIllness, DHF)
     
 
+t.0.016 %>%
+  select(ID)
 
 ggplot(t.0.016r, aes(x=TpIllness, y=X3, color=Period, group=Repeated)) + geom_line(size=2) + 
   geom_point() + facet_wrap(~ Repeated)
