@@ -159,9 +159,47 @@ ggplot(df, aes(x=Position2, y=Freq)) + geom_line(aes(color=DHF), size=1.5) +
 
 
 
+#########################################################################################
+################ Repeated Sapmle ########################################################
 
 
-  
-  
-  
-  
+library(dplyr)
+
+no.repeated = 
+t.demo %>% 
+  filter(Repeated != ".") %>% 
+    select(c.1.150.)
+
+ls.rp.c0 = lsfull.C0m[no.repeated[,1]] # n = 58 ! should remove DV2132 k=5
+
+outls.rp.r1000.0.016.ps = pvariantM(ls.rp.c0, 0.016, 3, 1)
+outls.rp.r1000.0.02.ps = pvariantM(ls.rp.c0, 0.02, 3, 1)
+
+# modify to remove DV2132 and add ID and T
+
+outls.rp.r1000.0.016.psM = 
+outls.rp.r1000.0.016.ps %>%
+  filter(mxk != 5) %>%
+    select(mx, mxk)
+
+#call Variability.R:: t.0.016r
+
+cc = t.0.016r$Repeated
+t = c(duplicated(t.0.016r$Repeated))
+t = recode(as.character(t), "FALSE" = "T1","TRUE" = "T2")
+tt = c(17, 33, 36, 39, 44, 45, 48, 51, 54, 57)
+t[tt] = "T3"
+t[52] = "T4"
+
+d0 = sapply(outls.rp.r1000.0.016.psM$mxk, function(x){if(x >4){ x -1} else{x} })
+d1 = sapply(d0, function(x) cc[x])
+d2 = sapply(d0, function(x) t[x])
+pp = as.numeric(as.character(outls.rp.r1000.0.016.psM$mx))
+outls.rp.r1000.0.016.psM$mx
+
+outls.rp.r1000.0.016.psM = data.frame(outls.rp.r1000.0.016.psM, d1, d2, pp)
+
+psm=ggplot(outls.rp.r1000.0.016.psM,aes(mx, color=d2)) + 
+  geom_histogram(binwidth = 5, fill="white") + facet_wrap(~ d1) +  theme_bw() +
+  scale_color_manual(values=c("Green", "Red", "Green", "Red")) + xlab("Position") +
+  ylab("Cumulative counts")
