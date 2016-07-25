@@ -39,8 +39,10 @@ for(i in 1:length(subls)){
 #########################################################################
 #### to creat summary files AA (AA SUM) #################################
 
-setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Combined/aligned")
 library(seqinr)
+library(dplyr)
+
+setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Combined/aligned")
 subls <-list.files(getwd())
 
   for(i in 1:length(subls)){
@@ -62,27 +64,23 @@ subls <-list.files(getwd())
   hh = h + 2
   ahk<-ah[, h:hh]
   
-    for(j in 1:dim(ahk)[1]){ #each codon
+  
+    ahkk = ahk[complete.cases(ahk),]
+    
+    if (nrow(ahkk) != 0){
       
-      if ( (is.na(ahk[j, 1]) != "TRUE") &
-           (is.na(ahk[j, 2]) != "TRUE") & 
-           (is.na(ahk[j, 3]) != "TRUE")){
+      tahkk = as.vector(t(ahkk))
+      tahkk = recode(tahkk, "TRUE" = "T", "N" = "*")
+      
+      jk = translate(tahkk)
+    
+      account.m[   match( data.frame( table( jk ) )$jk, rownames(account.m) ), k ] =
         
-        jc = c(as.character(ahk[j, 1]), as.character(ahk[j, 2]), as.character(ahk[j, 3]))
-        
-        translate(aa)
-        jc.a = translate(aa)
-        jk[length(jk) + 1] = jc.a
+        data.frame(table( jk ))$Freq    
+      
+    } 
 
-        account.m[   match( data.frame( table( jk ) )$jk, rownames(account.m) ), k ] =
-          
-                  data.frame(table( jk ))$Freq        
-                
       }
-      
-      
-    }
-}
 
   tf.bind.m         <- matrix(0,23,ncol(account.m))
   tf.bind.m [1:21,] <- account.m[1:21,]
