@@ -36,6 +36,72 @@ for(i in 1:length(subls)){
   print(subls[i])
 }
 
+#########################################################################
+#### to creat summary files AA (AA SUM) #################################
+
+setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Combined/aligned")
+library(seqinr)
+subls <-list.files(getwd())
+
+  for(i in 1:length(subls)){
+  
+  t1=Sys.time()  
+  ah <- read.csv(subls[i])
+
+  account.m =  matrix(0,26, ((dim(ah)[2]-1)/3))
+  AA.sort   =  c("G","A","V","L","I","W","Y","D","H"
+                 ,"N","E","K","Q","M","R","S","C","P"
+                 ,'-',"*","X","F","FALSE","T"," TRUE","TRUE")
+  rownames(account.m) = AA.sort
+  
+  
+  for( k in 1:((dim(ah)[2]-1)/3)){
+  
+  jk=c() # for each aa position k
+  h = (k-1)*3 + 1 + 1
+  hh = h + 2
+  ahk<-ah[, h:hh]
+  
+    for(j in 1:dim(ahk)[1]){ #each codon
+      
+      if ( (is.na(ahk[j, 1]) != "TRUE") &
+           (is.na(ahk[j, 2]) != "TRUE") & 
+           (is.na(ahk[j, 3]) != "TRUE")){
+        
+        jc = c(as.character(ahk[j, 1]), as.character(ahk[j, 2]), as.character(ahk[j, 3]))
+        
+        translate(aa)
+        jc.a = translate(aa)
+        jk[length(jk) + 1] = jc.a
+
+        account.m[   match( data.frame( table( jk ) )$jk, rownames(account.m) ), k ] =
+          
+                  data.frame(table( jk ))$Freq        
+                
+      }
+      
+      
+    }
+}
+
+  tf.bind.m         <- matrix(0,23,ncol(account.m))
+  tf.bind.m [1:21,] <- account.m[1:21,]
+  tf.bind.m [22,]   <- colSums(account.m[22:23,])
+  tf.bind.m [23,]   <- colSums(account.m[24:26,])
+  
+  tfAA.sort =c("G","A","V","L","I","W","Y","D","H"
+               ,"N","E","K","Q","M","R","S","C","P",'-',"*","X","F","T")
+  rownames(tf.bind.m) = tfAA.sort
+
+  write.csv(tf.bind.m, paste0("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Combined/AASUM/AASUM",subls[i],".csv" ))
+  
+  print(Sys.time()-t1)
+  print(subls[i])
+
+}
+
+
+
 #Post Summarization QC  ---------------------------------------------
 
 setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/LOG")
