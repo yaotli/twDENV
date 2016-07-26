@@ -1,5 +1,9 @@
 #this .R file focus on region recognition
 
+# E protein: 937 - 2421 
+# E protein: (aa) 281 - 775
+
+
 #lsfullm = lsfull[-(pairedS.No[65])]
 #lsfull.C0m = lsfull.C0[-103]
 #pairedS.Nom
@@ -201,5 +205,5 @@ outls.rp.r1000.0.016.psM = data.frame(outls.rp.r1000.0.016.psM, d1, d2, pp)
 
 psm=ggplot(outls.rp.r1000.0.016.psM,aes(mx, color=d2)) + 
   geom_histogram(binwidth = 5, fill="white") + facet_wrap(~ d1) +  theme_bw() +
-  scale_color_manual(values=c("Green", "Red", "Green", "Red")) + xlab("Position") +
+  scale_color_manual(values=c("Green", "Blue", "Red", "Purple")) + xlab("Position") +
   ylab("Cumulative counts")
