@@ -71,6 +71,7 @@ subls <-list.files(getwd())
       
       tahkk = as.vector(t(ahkk))
       tahkk = recode(tahkk, "TRUE" = "T", "N" = "*")
+      tahkk = as.character(tahkk)
       
       jk = translate(tahkk)
     
