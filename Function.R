@@ -637,7 +637,77 @@ pvariantM<-function(ls, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant,
 }
 
 
+#3.7 position recognition fo AA (& for Heatmap)
+
+pvariantAA.E<-function(ls, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant, 
   
+  mx = c()
+  nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
+  
+  library(dplyr)
+  
+  for (k in 1:length(ls)){  #each file
+    
+    dddf<-read.csv(ls[k])
+    lth = length(dddf)
+    
+    # E protein AA region: 313 - 807
+    
+    ia = 313 + 1
+    ib = 807 + 1
+    saa = c(1:23)[-(19:21)]           #19- 21 : "*", "-", "X"
+    
+    for(i in ia: ib){                 #each position
+      
+      vc = as.vector(dddf[,i])
+      vc = data.frame(vc)
+      
+      tcc = sum(vc[,1][saa]) # nr
+      position = i - 313
+      
+      if ( tcc >= nrv[nr] ){
+        
+        mm = max(vc[,1][saa])
+        
+        NOr =      
+          vc %>%
+          filter(vc != mm) %>%
+          filter(vc >= mm*pc) %>%
+          nrow()        
+        
+        if (kd == 1){
+          
+          if (NOr > 0){ variantaa = 1 } else { variantaa = 0 }
+          
+          region = data.frame(k, position, variantaa, tcc)
+          mx = rbind(mx, region)
+          
+          
+        }else{
+          
+          variantaa = NOr
+          
+          region = data.frame(k, position, variantaa, tcc)
+          mx = rbind(mx, region)
+          
+        }
+        
+        
+      }else { variantaa = 0 
+      
+      region = data.frame(k, position, variantaa, tcc)
+      mx = rbind(mx, region)}
+      
+      
+    }     
+    print((k/length(ls)*100)) 
+    
+  }      
+  
+  return(mx)
+}  
+
+
 ##4 main sequences differences between paired sample 
 #(Main-Difference-between-Paired, mdbp & lsmdbp) -----------------------------
 
