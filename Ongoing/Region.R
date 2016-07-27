@@ -188,18 +188,24 @@ ticks.aa<-outreg.df.r1000.0.02.v$position[1:495]
 tt=seq(0, 495, by=5)[-1]
 ticklab.aa<-seq(0, 495, by=5)[-1]
 
+# from Region.R
+
+test = data.frame(0, outreg.df.r1000.0.05.v$position[1:495], g.E.poly-1, 0)
+names(test) = c("k","position", "variantaa", "tcc")   
+test = rbind(outreg.df.r1000.0.08.v, test)
+
 
 vh = ggplot(test, aes(position, k)) + geom_tile(aes(fill=variantaa), colour="white") + 
   
-        scale_fill_gradient(low="white", high="Blue") + theme_bw() +
+  scale_fill_gradient(low="white", high="Blue") + theme_bw()  +
   
   theme(axis.text.x=element_text(angle=90, vjust = 0.5)) + xlab("") + ylab("Sample") +
   
   scale_x_continuous(breaks=tt, labels=tt)
 
-ch = ggplot(test, aes(position, k)) + geom_tile(aes(fill=tcc), colour="white") + 
+ch = ggplot(outreg.dhf.r1000.0.08.v, aes(position, k)) + geom_tile(aes(fill=variantaa), colour="white") + 
   
-  scale_fill_gradient(low="white", high="Red") + theme_bw() +
+  scale_fill_gradient(low="white", high="Red") + theme_bw()  +
   
   theme(axis.text.x=element_text(angle=90, vjust = 0.5)) + xlab("") + ylab("Sample") +
   
@@ -207,6 +213,8 @@ ch = ggplot(test, aes(position, k)) + geom_tile(aes(fill=tcc), colour="white") +
 
 
 multiplot(vh, ch)
+
+
 
 
 
