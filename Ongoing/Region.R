@@ -1,15 +1,14 @@
 #this .R file focus on region recognition
 
-# E protein: 937 - 2421 
-# E protein: (aa) 281 - 775
+# E protein: (nt) 937 - 2421 
+# E protein: (aa) 313 - 807
 
+# lsfullm = lsfull[-(pairedS.No[65])]
+# lsfull.C0m = lsfull.C0[-103]
+# pairedS.Nom
 
-#lsfullm = lsfull[-(pairedS.No[65])]
-#lsfull.C0m = lsfull.C0[-103]
-#pairedS.Nom
-
-lsfull.C0m.0102 = lsfull.C0m[1:77] #n = 77
-lsfull.C0m.15 = lsfull.C0m[78:150] #n = 73
+# lsfull.C0m.0102 = lsfull.C0m[1:77] #n = 77
+# lsfull.C0m.15 = lsfull.C0m[78:150] #n = 73
 
 
 # use pvariant -----
@@ -35,22 +34,6 @@ hp = ggplot(outreg.15.r1000.0.05.vns, aes(region, k)) + geom_tile(aes(fill=Freq)
   
             scale_x_discrete(breaks=ticksss, labels=ticklab)
 
-#################################
-# outreg.0102.r1000.0.05.ps
-# outreg.15.r1000.0.05.ps
-# outreg.0102.r1000.0.05.pns
-# outreg.15.r1000.0.05.pns
-# 
-# outreg.0102.r1000.0.01.ps
-# outreg.15.r1000.0.01.ps
-# outreg.0102.r1000.0.01.pns
-# outreg.15.r1000.0.01.pns
-#
-# outreg.0102.r1000.0.05.vs
-# outreg.15.r1000.0.05.vs
-# outreg.0102.r1000.0.05.vns
-# outreg.15.r1000.0.05.vns
-
 
 #########################################################################################
 ################ DHF ####################################################################
@@ -71,7 +54,9 @@ outreg.dhf.r1000.0.02.vs = pvariant(ls.DHF.c0, breaks, 0.02, 3, 1)
 
 # outreg.df.r1000.0.02.vs
 # outreg.dhf.r1000.0.02.vs
+
 #heatmap
+
 library(ggplot2)
 hp = ggplot(outreg.df.r1000.0.02.vs, aes(region, k)) + geom_tile(aes(fill=Freq), colour="white") + 
   
@@ -160,6 +145,70 @@ names(df) = c("Position", "Freq", "Position2","DHF")
 ggplot(df, aes(x=Position2, y=Freq)) + geom_line(aes(color=DHF), size=1.5) +
   xlab("Position") + ylab("Normalized count") + 
   scale_color_manual(values=c("#56B4E9", "#CC79A7"))  
+
+
+################################################################################
+### AA position #################################################### DF vs DHF #
+
+
+# lsfull.aa <- c(list.files(getwd())[213:221], list.files(getwd())[1:212])
+# lsfull.c.aa <- strsplit(lsfull, split="-", fixed = T) #cut by "-"
+# cstatus.aa <- sapply(lsfull.c.aa, function(x) length(x) == 1 )
+# cstatus.aa <- gsub("TRUE", replacement = "C0", cstatus.aa)
+# cstatus.aa <- gsub("FALSE", replacement = "C1", cstatus.aa)         #all C status
+
+# lsfull.C0.aa <- lsfull.aa[which(cstatus.aa == "C0")]    # n = 151
+# lsfull.C1.aa <- lsfull.aa[which(cstatus.aa == "C1")]    # n = 70
+# lsfull.C0m.aa = lsfull.C0.aa[-103]                      # eliminate DENV5083
+
+# ls.DF.c0.aa = lsfull.C0m.aa[no.DF.c0[,1]]               # n = 127
+# ls.DHF.c0.aa = lsfull.C0m.aa[no.DHF.c0[,1]]             # n = 22; eliminate DV2355 
+
+
+##### Use pvariantAA.E #####
+
+#position
+ outreg.df.r1000.0.02.p = pvariantAA.E(ls.DF.c0.aa, 0.02, 3, 1)
+outreg.dhf.r1000.0.02.p = pvariantAA.E(ls.DHF.c0.aa, 0.02, 3, 1)
+ outreg.df.r1000.0.05.p = pvariantAA.E(ls.DF.c0.aa, 0.05, 3, 1)
+outreg.dhf.r1000.0.05.p = pvariantAA.E(ls.DHF.c0.aa, 0.05, 3, 1)
+
+#variant
+ outreg.df.r1000.0.02.v = pvariantAA.E(ls.DF.c0.aa, 0.02, 3, 2)
+outreg.dhf.r1000.0.02.v = pvariantAA.E(ls.DHF.c0.aa, 0.02, 3, 2)
+ outreg.df.r1000.0.05.v = pvariantAA.E(ls.DF.c0.aa, 0.05, 3, 2)
+outreg.dhf.r1000.0.05.v = pvariantAA.E(ls.DHF.c0.aa, 0.05, 3, 2)
+
+
+test = rbind(outreg.df.r1000.0.02.p, outreg.dhf.r1000.0.02.p)
+
+library(ggplot2)
+
+ticks.aa<-outreg.df.r1000.0.02.v$position[1:495]
+tt=seq(0, 495, by=5)[-1]
+ticklab.aa<-seq(0, 495, by=5)[-1]
+
+
+vh = ggplot(test, aes(position, k)) + geom_tile(aes(fill=variantaa), colour="white") + 
+  
+        scale_fill_gradient(low="white", high="Blue") + theme_bw() +
+  
+  theme(axis.text.x=element_text(angle=90, vjust = 0.5)) + xlab("") + ylab("Sample") +
+  
+  scale_x_continuous(breaks=tt, labels=tt)
+
+ch = ggplot(test, aes(position, k)) + geom_tile(aes(fill=tcc), colour="white") + 
+  
+  scale_fill_gradient(low="white", high="Red") + theme_bw() +
+  
+  theme(axis.text.x=element_text(angle=90, vjust = 0.5)) + xlab("") + ylab("Sample") +
+  
+  scale_x_continuous(breaks=tt, labels=tt)
+
+
+multiplot(vh, ch)
+
+
 
 
 
