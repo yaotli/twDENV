@@ -8,25 +8,22 @@ ls05 <- c(list.files(getwd())[130:212])
 
 #### "ALL" C0 vs C1 + varies cutting value (0.05, 0.1, 0.2, 0.25)
 
-lsfull.c <- strsplit(lsfull, split="-", fixed = T) #cut by "-"
-cstatus <- sapply(lsfull.c, function(x) length(x) == 1 )
-cstatus <- gsub("TRUE", replacement = "C0", cstatus)
-cstatus <- gsub("FALSE", replacement = "C1", cstatus)         #all C status
+# lsfull.c <- strsplit(lsfull, split="-", fixed = T) #cut by "-"
+# cstatus <- sapply(lsfull.c, function(x) length(x) == 1 )
+# cstatus <- gsub("TRUE", replacement = "C0", cstatus)
+# cstatus <- gsub("FALSE", replacement = "C1", cstatus)         #all C status
+# lsfull.C0 <- lsfull[which(cstatus == "C0")] #n = 151
+# lsfull.C0m = lsfull.C0[-103]
+# lsfull.C1 <- lsfull[which(cstatus == "C1")] #n = 70
 
-lsfull.C0 <- lsfull[which(cstatus == "C0")] #n = 151
-lsfull.C0m = lsfull.C0[-103]
-lsfull.C1 <- lsfull[which(cstatus == "C1")] #n = 70
 
+# rmSUM <-gsub("SUM", replacement = "", lsfull)
+# rmSUM.c <- strsplit(rmSUM, split="_", fixed = T) #cut by "-"
+# lsfull.NO <- sapply(rmSUM.c, function(x) head(x,1))           #all sample numbering
+# lsfull.NOm <- lsfull.NO[-171]                                 #remove problematic #5083
+# write.csv(lsfull.C0m, "full.csv")
 
-rmSUM <-gsub("SUM", replacement = "", lsfull)
-rmSUM.c <- strsplit(rmSUM, split="_", fixed = T) #cut by "-"
-
-lsfull.NO <- sapply(rmSUM.c, function(x) head(x,1))           #all sample numbering
-lsfull.NOm <- lsfull.NO[-171]                                 #remove problematic #5083
-
-write.csv(lsfull.C0m, "full.csv")
-
-### pooled ----- 
+#### pooled ########
 #syn.r1000.table0605
 
 for (i in 1:4){
