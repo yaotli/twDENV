@@ -47,12 +47,69 @@ summary(mm) #beta = 0.001139 Error Rate = beta / ( 1 + beta ) = 0.0113
 abline(mm)
 
 
+
+
+############################################################
+###### to calculate systemic error rate ###### AA ##########
+
+
+vRa  = c() # variant/shadow reads
+TRa  = c() # total reads of respective position
+aRa  = c() # all reads
+mTRa = c() # total reads for all
+
+for(k in 1: length(ls)){
+  
+  dddf <- read.csv(ls[k])
+  
+  for(i in 303: 835){              #region actually followed by primers
+    
+    saa = c(1:23)[-(19:21)]        #19- 21 : "*", "-", "X"
+    
+    
+    tcc = sum(dddf[,i][saa])         #total counts
+    
+    if (tcc != 0){
+      
+      aRa = c(aRa, dddf[,i][saa])  
+      mTRa = c(mTRa, rep(tcc, 20))
+
+          cc = which.max(dddf[,i][saa])
+          
+      vRa = c(vRa, dddf[,i][saa][-cc])
+      TRa = c(TRa, rep(tcc, 19))
+      
+    }
+    
+  }
+  
+  print((k/length(ls)*100))
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ######################################################################################
 # examine the distribution of the 2nd most variant % in each position in all samples #
 
 
-allsend.r0 = sndvariantp(lsfull, 1) # max(allsend.r0)  
-allsend.r500 = sndvariantp(lsfull, 2) # max(allsend.r500) 
+allsend.r0 = sndvariantp(lsfull, 1)           # max(allsend.r0)  
+allsend.r500 = sndvariantp(lsfull, 2)         # max(allsend.r500) 
+
 c=c(allsend.r0, allsend.r500)
 cc=c(rep("0", length(allsend.r0)), rep("500", length(allsend.r500)))
 a=data.frame(c, cc) 
