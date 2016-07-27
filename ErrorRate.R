@@ -87,18 +87,15 @@ for(k in 1: length(ls)){
   
 }
 
+rrR = vRa/TRa 
+plot(density(vRa))
+polygon(density(rrR), col = "red", border = "gray") #distribution of all values
+quantile(rrR, 0.99) # 0.08 = Q99.9; 0.0365 = Q99
 
-
-
-
-
-
-
-
-
-
-
-
+plot(TRa, vRa, pch=20)
+mm = lm (vR ~ TR)
+summary(mm) #beta = 0.001139 Error Rate = beta / ( 1 + beta ) = 0.0113
+abline(mm)
 
 
 
