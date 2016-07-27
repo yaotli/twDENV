@@ -291,47 +291,7 @@ b3=ggplot(b, aes(x=TpIllness, y=X1, colour=Period)) +
   geom_point() + facet_wrap(~ Period)
 
 
-########## examine the distribution of the 2nd most variant % in each position in all samples
 
-
-  allsend.r0 = sndvariantp(lsfull, 1) # max(allsend.r0)  
-  allsend.r500 = sndvariantp(lsfull, 2) # max(allsend.r500) 
-  c=c(allsend.r0, allsend.r500)
-  cc=c(rep("0", length(allsend.r0)), rep("500", length(allsend.r500)))
-  a=data.frame(c, cc) 
-  names(a) = c("position", "reads")
-  
-  aa=data.frame(allsend.r500, rep(500, length(allsend.r500)))
-  names(aa) = c("position", "reads")
-  
-
-#dis
-  p<-ggplot(a, aes(position, fill = reads)) + geom_density(alpha = 0.2)
-  
-  
-#jitter
-  j=ggplot(a, aes(reads, position)) + geom_jitter(alpha=I(1/4), aes(color=position))
-
-  #pirate  
-  library(yarrr)
-  p=pirateplot(formula = position ~ reads , data = aa, theme.o = 3, 
-               main="", inf = "ci",
-               ylab="", gl.col = gray(.8),
-               pal="basel")
-  
-  box(which = "p")
-#box  
-  b=ggplot(a, aes(reads, position, fill=reads)) + geom_boxplot(aes(fill=reads)) + ylab("Position") +
-            theme(legend.position = "none") + ylim(0,0.05)
-
-#t.test for CI
-  
-  t.test(allsend.r0) # mean = 0.01565829 CI = 0.01555479, 0.01576180 
-  t.test(allsend.r500) # mean = 0.01418616 CI = 0.01410864, 0.01426368
-  
-  sd(allsend.r0) 
-  0.01565829 + 2.58*(  sd(allsend.r0) )/sqrt(length(allsend.r0)) #set to 99%
-  
   
 ###########################################################################  
 ################ 3 DHF ----------------------------------------------------
