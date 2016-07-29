@@ -708,6 +708,12 @@ pvariantAA.E<-function(ls, pc, nr, kd){ #kd = kind: 1 = position, 2 = all varian
 }  
 
 
+#3.8 Poisson test for pvariant
+
+
+
+
+
 ##4 main sequences differences between paired sample 
 #(Main-Difference-between-Paired, mdbp & lsmdbp) -----------------------------
 
@@ -858,5 +864,51 @@ sndvariantp<-function(ls, nr){
    return(pVarN) 
     
   }
+
+##7 for error rate -------------------------------------- 
+
+#1
+ff1c = function(v){
+  
+  mx = which.max(v)
+  v = v[-mx]  
+  return(v)  
+}
+
+ff1t = function(v){
+  
+  fft1 = sum(v)
+  
+  mx = which.max(v)
+  t = rep(fft1, length(v[-mx]))
+  return(t)
+}
+
+#0
+ff0c = function(v){
+  
+  mx = which.max(v)
+  m0 = which(v == 0)
+  
+  m = c(mx, m0)
+  v = v[-m]  
+  return(v)  
+}
+
+ff0t = function(v){
+  
+  fft0 = sum(v)
+  
+  mx = which.max(v)
+  m0 = which(v == 0)
+  
+  m = c(mx, m0)
+  t = rep(fft0, length(v[-m]))
+  return(t)
+}
+
+
+
+
 
 
