@@ -233,10 +233,10 @@ variantPT <- function(df, pc, nr){
       if (nrow(vci) > 0){ 
         
         VarNi = mAA[vci[,2]]
-        refNi = rep(mAA[vc[,2][which.max(vc[,1])]], ncol(vci))
+        refNi = rep(mAA[vc[,2][which.max(vc[,1])]], nrow(vci))
         pVarNi = c(vci[,1]/tcc)
         
-        sVarN = c(sVarN, rep(ii, ncol(vci)))
+        sVarN = c(sVarN, rep(ii, nrow(vci)))
         VarN  = c(VarN, VarNi)
         refN  = c(refN, refNi)
         pVarN = c(pVarN, pVarNi)
