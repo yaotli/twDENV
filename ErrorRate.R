@@ -152,7 +152,7 @@ plot(nn, ER0, pch=20, xaxt='n',xlab="Position", ylab = "Error Rate",
       text(nn[which(ER0 > 0.02)], ER0[which(ER0 > 0.02)], nn[which(ER0 > 0.02)], pos=3, cex=0.5, col="Blue")
      
       
-### pooled re-accessment 
+########## pooled re-accessment  #####
       
       for(i in 904: 2505){                             #real position: 902 - 2503
         
@@ -186,9 +186,20 @@ plot(nn, ER0, pch=20, xaxt='n',xlab="Position", ylab = "Error Rate",
       ERp1 = (b1 / (b1 + 1))
       ERp0 = (b0 / (b0 + 1))
       
-      
-      
-      
+########################################################################
+# Estimated region: 902 - 2503 (1602 nt)      
+# pooled-ER = ERp0 = 0.01125579
+# site-specific error rate = ER0
+#       
+# we set adjusted site-specific error-rate = adjER
+# adjER = pooled-ER + site-specific error rate   
+# thus: adjER = rep(0, 3000) 
+#       adjER0 = ERp0 + ER0
+#       adjER0[which(ER0 == 0)] = 0
+#  adjER[902:2503] = adjER0  
+#              
+# we then use adjER in Poisson dist. to detect variant in each position #
+            
 ############################################################
 ###### to calculate systemic error rate ###### AA ##########
 ############################################################
