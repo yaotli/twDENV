@@ -1043,8 +1043,51 @@ ff0t = function(v){
   return(t)
 }
 
+##8 for .bam file -------------------------------------- 
 
 
+bamseqprep <- function(bam){
+  
+  library(stringr)
+  
+  r.bam <- scanBam(BamFile(file.choose()))
+  
+  rmcigar = c("N", "P", "=", "X")
 
+  lcigar = strsplit(r.bam[[1]]$cigar, split ="")
+  rml = which(unlist(lapply(lcigar, function(x){any(rmcigar %in% x)})) == TRUE)
+  
+  if (length(rml) != 0){
+  lcigar = lcigar[-rml]
+  lseq = as.list(as.character(r.bam[[1]]$seq))[-rml]
+  }
+  
+  rml1 = which(unlist(lapply(lcigar, function(x){any("I" %in% x)})) == TRUE)
+  lseq1 = lseq[rml1]
+  lcigar1 = lcigar[rml1]
+  
+  
+  
+  
+  IDcigar = c("D")
+  if (any(IDcigar %in% ))
+  
+  
+  
+  
+  
+  
+  mm = matrix(NA, 1, 3000)
+  
+  strsplit()
+  
+  
+  st = c( rep()
+    strsplit(as.character(st), split='')
+  
+  
+  
+  
+}
 
 
