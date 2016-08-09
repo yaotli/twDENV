@@ -267,3 +267,25 @@ for(Rfdi in 1: length(Rfd)) { #for each sample; each Rfdi indicates one sample
   
 }
 
+
+##################################################################
+###
+### .bam mapping
+###
+##################################################################
+
+##### Test
+
+q20.915 = bamseqprep("q20.915.bam")
+write.csv(q20.915, "q20.915.csv")
+q30.915 = bamseqprep("q30.915.bam")
+write.csv(q30.915, "q30.915.csv")
+
+
+
+
+
+
+
+
+
