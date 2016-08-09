@@ -924,7 +924,7 @@ lsmdbp<-function(ls, lss, nr){  #fist list and second list
 ##5 extract consens sequence ----------------------------------------
 
 conSUM<-function(ls, nr){
-  
+  library(seqinr)
   mx=c()
   nrv=c(0, 500, 1000, 2000, 2500) #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
   
@@ -1047,26 +1047,26 @@ ff0t = function(v){
 
 bamseqprep <- function(bam){
   
-  
   library(pasillaBamSubset)
   library(stringr)
+  library(Rsamtools)
   
   r.bam <- scanBam(BamFile(bam))
   
   rmcigar = c("N", "P", "=", "X")           # discard 4
-                                            # keep: D, I, S, H, M          
+  # keep: D, I, S, H, M          
   lcigar = strsplit(r.bam[[1]]$cigar, split ="")
   rml = which(unlist(lapply(lcigar, function(x){any(rmcigar %in% x)})) == TRUE)
   
   if (length(rml) != 0){
     
-  lcigar = as.list( r.bam[[1]]$cigar[-rml] )                # lcigar
-  lseq = as.list( as.character(r.bam[[1]]$seq) )[-rml]      # lseq
-  lpos = as.list( r.bam[[1]]$pos[-rml] )                    # lpos
-  lss = as.list(r.bam[[1]]$strand[-rml])                    # sense
-  
-  ll = Map(c, lpos, lcigar, lss, lseq)
-  
+    lcigar = as.list( r.bam[[1]]$cigar[-rml] )                # lcigar
+    lseq = as.list( as.character(r.bam[[1]]$seq) )[-rml]      # lseq
+    lpos = as.list( r.bam[[1]]$pos[-rml] )                    # lpos
+    lss = as.list(r.bam[[1]]$strand[-rml])                    # sense
+    
+    ll = Map(c, lpos, lcigar, lss, lseq)
+    
   }else{   
     
     lcigar = as.list( r.bam[[1]]$cigar )                # lcigar
@@ -1077,20 +1077,18 @@ bamseqprep <- function(bam){
     
     ll = Map(c, lpos, lcigar, lss, lseq)
     
-    }
-
-
+  }
+  
+  
   mm = do.call("rbind", lapply(ll, function(y){
     
-## function(y)
+    ## function(y)
     
     cigar.i = y[2]
     Scigar.i = strsplit(cigar.i, split="")[[1]]
     ss.i = y[3]
     
     seq.i = unlist(strsplit(y[4], split = ""))
-    pos.i = as.numeric(y[1])
-    Mt.i = matrix(c(rep("NA", pos.i-1), seq.i, rep("NA", 3000-length(seq.i)-pos.i+1)), 1)
     
     p.Chr = which(regexpr("[[:upper:]]+", Scigar.i) + 1 > 0)  # Upper Alphabet
     p.Num = which(regexpr("[[:digit:]]+", Scigar.i) + 1 > 0)  # Digit
@@ -1109,29 +1107,58 @@ bamseqprep <- function(bam){
     
     Chri=Scigar.i[p.Chr]
     
-    if ("I" %in% Chri){
+    if(Chri[1] == "S"){
+      pos.i = as.numeric(y[1]) - l.unit[1]
+      Mt.i = matrix(c(rep("NA", pos.i-1), seq.i, rep("NA", 3000-length(seq.i)-pos.i+1)), 1)
       
-        irm = c()
+    }else{
+      pos.i = as.numeric(y[1])
+      Mt.i = matrix(c(rep("NA", pos.i-1), seq.i, rep("NA", 3000-length(seq.i)-pos.i+1)), 1)
+    }
+    
+    
+    ID = c("I", "D")
+    
+    if (any(ID %in% Chri)){
+      
+      if (length(which(Chri == "I")) >= 1){
+        
+        irm = c()                    # deal with I
         
         for(h in 1: length(which(Chri == "I"))){
-        
-        l = which(Chri == "I")[h] - 1
-        
-        i.start = pos.i + sum(l.unit[0:l])
-        i.stop = pos.i + sum(l.unit[0:l]) + l.unit[which(Chri == "I")[h]] - 1
-        
-        irm = c(irm, seq(i.start,i.stop)) }
+          
+          l = which(Chri == "I")[h] - 1
+          
+          i.start = pos.i + sum(l.unit[0:l])
+          i.stop = pos.i + sum(l.unit[0:l]) + l.unit[which(Chri == "I")[h]] - 1
+          
+          irm = c(irm, seq(i.start,i.stop)) }
         
         Mt.i = matrix(c(Mt.i[,-(irm)], 
-                     rep("NA", sum( l.unit[which(Chri == "I")] ) )), 1)
+                        rep("NA", sum( l.unit[which(Chri == "I")] ) )), 1) }
+      
+      
+      if (length(which(Chri == "D")) >= 1){
         
+        irm = c()                    # deal with D
+        
+        for(h in 1: length(which(Chri == "D"))){
+          
+          l = which(Chri == "D")[h] - 1
+          
+          i.start = pos.i + sum(l.unit[0:l])
+          
+          Mt.i = matrix(c(Mt.i[1:i.start-1], rep("NA", l.unit[which(Chri == "D")[h]]),
+                          Mt.i[i.start:(3000- (l.unit[which(Chri == "D")[h]]))]) ,1) }
+        
+      }
       
       
-        dMI = which(Chri != "M" & Chri != "I")
+      dMI = which(Chri != "M" & Chri != "I" & Chri != "D")
       
       if(length(dMI) >= 1){
         
-        l.unit.dI = l.unit[-which(Chri == "I")]
+        l.unit.dI = l.unit[-which(ID %in% Chri)]
         
         for(k in 1: length(dMI)){
           
@@ -1141,74 +1168,77 @@ bamseqprep <- function(bam){
           r.stop = pos.i + sum(l.unit.dI[0:l]) + l.unit[dMI[k]] - 1
           
           for(p in 1:length(r.start)){
-            Mt.i[ , r.start[p]:r.stop[p]]= NA }}   
-     
-        }  
+            Mt.i[ , r.start[p]:r.stop[p]]= "NA" }}   }  
+      
+      
+      if(ss.i == "1"){
         
+        Pf<-c(884, 901, 1310, 1327, 1616, 1635, 2026, 2044)
+        for(k in 1:4){
+          
+          kk = (k-1)*2+1
+          Mt.i[ ,Pf[kk]:Pf[kk+1]]="NA"}
         
-        if(ss.i == "1"){
-          
-          Pf<-c(884, 901, 1310, 1327, 1616, 1635, 2026, 2044)
-          for(k in 1:4){
-            
-            kk = (k-1)*2+1
-            Mt.i[ ,Pf[kk]:Pf[kk+1]]=NA}
-          
-          return(Mt.i)}
+        return(Mt.i)}
+      
+      if(ss.i == "2"){
         
-        if(ss.i == "2"){
+        Pr<-c(1357, 1376, 1752, 1770, 2035, 2053, 2504, 2524)
+        for(k in 1:4){
           
-          Pr<-c(1357, 1376, 1752, 1770, 2035, 2053, 2504, 2524)
-          for(k in 1:4){
-            
-            kk = (k-1)*2+1
-            Mt.i[ ,Pr[kk]:Pr[kk+1]]=NA}
-          
-          return(Mt.i)}
+          kk = (k-1)*2+1
+          Mt.i[ ,Pr[kk]:Pr[kk+1]]="NA"}
         
-        } else {
-            
-            
-            dM = which(Chri != "M")
-            
-            if(length(dM) >= 1){
-              
-              for(k in 1: length(dM)){
-                
-                l = dM[k] - 1 
-                
-                r.start = pos.i + sum(l.unit[0:l])
-                r.stop = pos.i + sum(l.unit[0:l]) + l.unit[dM[k]] - 1
-              
-                for(p in 1:length(r.start)){
-                  Mt.i[ , r.start[p]:r.stop[p]]= NA}}  
-            }    
-            
-            if(ss.i == "1"){
-              
-              Pf<-c(884, 901, 1310, 1327, 1616, 1635, 2026, 2044)
-              for(k in 1:4){
-                
-                kk = (k-1)*2+1
-                Mt.i[ ,Pf[kk]:Pf[kk+1]]=NA}
-              
-              return(Mt.i)}
-            
-            if(ss.i == "2"){
-              
-              Pr<-c(1357, 1376, 1752, 1770, 2035, 2053, 2504, 2524)
-              for(k in 1:4){
-                
-                kk = (k-1)*2+1
-                Mt.i[ ,Pr[kk]:Pr[kk+1]]=NA}
-              
-              return(Mt.i)}
-            
-            } 
+        return(Mt.i)}
+      
+    } 
     
-
+    else {
+      
+      
+      dM = which(Chri != "M")
+      
+      if(length(dM) >= 1){
+        
+        for(k in 1: length(dM)){
+          
+          l = dM[k] - 1 
+          
+          r.start = pos.i + sum(l.unit[0:l])
+          r.stop = pos.i + sum(l.unit[0:l]) + l.unit[dM[k]] - 1
+          
+          for(p in 1:length(r.start)){
+            Mt.i[ , r.start[p]:r.stop[p]]= "NA"}}  
+      }    
+      
+      if(ss.i == "1"){
+        
+        Pf<-c(884, 901, 1310, 1327, 1616, 1635, 2026, 2044)
+        for(k in 1:4){
+          
+          kk = (k-1)*2+1
+          Mt.i[ ,Pf[kk]:Pf[kk+1]]="NA"}
+        
+        return(Mt.i)}
+      
+      if(ss.i == "2"){
+        
+        Pr<-c(1357, 1376, 1752, 1770, 2035, 2053, 2504, 2524)
+        for(k in 1:4){
+          
+          kk = (k-1)*2+1
+          Mt.i[ ,Pr[kk]:Pr[kk+1]]="NA"}
+        
+        return(Mt.i)}
+      
+    } 
+    
+    
   }))
   
 }
+
+
+
 
 
