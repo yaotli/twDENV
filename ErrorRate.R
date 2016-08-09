@@ -6,8 +6,6 @@ ls = list.files(getwd())
 
 vR = c() # variant/shadow reads
 TR = c() # total reads of respective position
-aR = c() # all reads
-mTR = c() # total reads for all
 
 for(k in 1: length(ls)){
 
@@ -20,14 +18,14 @@ for(k in 1: length(ls)){
     
     if (tcc != 0){
       
-      aR = c(aR, dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i])  
-      mTR = c(mTR, rep(tcc, 4))
-      
       cc <- c(dddf[1,i], dddf[2,i], dddf[3,i], dddf[4,i])
-      mv = which.max(cc)
+      
+      if(length(which(cc == 0)) >= 1){
+      mv = c(which.max(cc), which(cc == 0))} else{
+        mv = c(which.max(cc))  }
       
       vR = c(vR, cc[-mv])
-      TR = c(TR, rep(tcc, 3))
+      TR = c(TR, rep(tcc, length(cc[-mv])))
       
     }
 
@@ -37,14 +35,14 @@ for(k in 1: length(ls)){
   
 }
 
-rrR = aR/mTR 
-plot(density(rrR))
+rrR = vR/TR 
+plot(density(log10(rrR)))
 polygon(density(rrR), col = "red", border = "gray") #distribution of all values
 
 plot(TR, vR, pch=20)
 mm = lm (vR ~ TR)
-summary(mm) #beta = 0.001139 Error Rate = beta / ( 1 + beta ) = 0.0113
-abline(mm)
+summary(mm) #beta = 0.001139 Error Rate = beta / ( 1 + beta ) = 0.0113 (fasta)
+abline(mm)  #beta = 0.0002269 (q20, .bam)
 
 ############################################################
 ###### Site-specific error rate ############################
