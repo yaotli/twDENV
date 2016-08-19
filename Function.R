@@ -1057,6 +1057,8 @@ bamseqprep <- function(bam){
   # keep: D, I, S, H, M          
   lcigar = strsplit(r.bam[[1]]$cigar, split ="")
   rml = which(unlist(lapply(lcigar, function(x){any(rmcigar %in% x)})) == TRUE)
+  rml2 = which(r.bam[[1]]$pos > 3000)
+  rml = unique(c(rml, rml2))
   
   if (length(rml) != 0){
     
