@@ -1123,6 +1123,21 @@ bamseqprep <- function(bam){
     
     if (any(ID %in% Chri)){
       
+      if (length(which(Chri == "D")) >= 1){
+        
+        irm = c()                    # deal with D
+        
+        for(h in 1: length(which(Chri == "D"))){
+          
+          l = which(Chri == "D")[h] - 1
+          
+          i.start = pos.i + sum(l.unit[0:l])
+          
+          Mt.i = matrix(c(Mt.i[1:i.start-1], rep("NA", l.unit[which(Chri == "D")[h]]),
+                          Mt.i[i.start:(3000- (l.unit[which(Chri == "D")[h]]))]) ,1) }
+        
+      }
+      
       if (length(which(Chri == "I")) >= 1){
         
         irm = c()                    # deal with I
@@ -1139,28 +1154,12 @@ bamseqprep <- function(bam){
         Mt.i = matrix(c(Mt.i[,-(irm)], 
                         rep("NA", sum( l.unit[which(Chri == "I")] ) )), 1) }
       
+      Chri.dI = Chri[-(which(Chri == "I"))]
+      dMI = which( Chri.dI != "M" & Chri.dI != "D" )
       
-      if (length(which(Chri == "D")) >= 1){
+      if( length(dMI) >= 1 ){
         
-        irm = c()                    # deal with D
-        
-        for(h in 1: length(which(Chri == "D"))){
-          
-          l = which(Chri == "D")[h] - 1
-          
-          i.start = pos.i + sum(l.unit[0:l])
-          
-          Mt.i = matrix(c(Mt.i[1:i.start-1], rep("NA", l.unit[which(Chri == "D")[h]]),
-                          Mt.i[i.start:(3000- (l.unit[which(Chri == "D")[h]]))]) ,1) }
-        
-      }
-      
-      
-      dMI = which(Chri != "M" & Chri != "I" & Chri != "D")
-      
-      if(length(dMI) >= 1){
-        
-        l.unit.dI = l.unit[-which(ID %in% Chri)]
+        l.unit.dI = l.unit[-which(Chri %in% "I" == TRUE)]
         
         for(k in 1: length(dMI)){
           
@@ -1170,7 +1169,7 @@ bamseqprep <- function(bam){
           r.stop = pos.i + sum(l.unit.dI[0:l]) + l.unit[dMI[k]] - 1
           
           for(p in 1:length(r.start)){
-            Mt.i[ , r.start[p]:r.stop[p]]= "NA" }}   }  
+            Mt.i[ , r.start[p]:r.stop[p]]= "NA" } }   }  
       
       
       if(ss.i == "1"){
@@ -1210,8 +1209,7 @@ bamseqprep <- function(bam){
           r.stop = pos.i + sum(l.unit[0:l]) + l.unit[dM[k]] - 1
           
           for(p in 1:length(r.start)){
-            Mt.i[ , r.start[p]:r.stop[p]]= "NA"}}  
-      }    
+            Mt.i[ , r.start[p]:r.stop[p]]= "NA"} }  }    
       
       if(ss.i == "1"){
         
