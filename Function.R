@@ -1256,7 +1256,7 @@ bamseqprepID <- function(bam){
   rml1 = which(unlist(lapply(lcigar, function(x){any(rmcigar %in% x)})) == TRUE)
   rml2 = which(unlist(lapply(lcigar, function(x){any(rmcigarID %in% x)})) == TRUE)
   rml3 = which(r.bam[[1]]$pos > 3000)
-  rml = unique(c(rml, rml2, rml3))
+  rml = unique(c(rml1, rml2, rml3))
   
   if (length(rml) != 0){
     
