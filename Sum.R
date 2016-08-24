@@ -100,46 +100,70 @@ subls <-list.files(getwd())
 }
 
 
+########## Post Mapping Quality Control ##################
 
-#Post Summarization QC  ---------------------------------------------
 
-setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/LOG")
-subls <-list.files(getwd())
+##### To summarize No. of reads and reads with Indel #####
+#
+
+
+library(pasillaBamSubset)
+library(stringr)
+library(Rsamtools)
+
+
+setwd("/data/usrhome/LabCCKing/ccking01/Ko/0810CLCmapping/0810bam/")
+
+ls0 = list.files(getwd())
+
+ls129 = ls0[1:129]
+ls129c = strsplit(ls129, split="_con", fixed = T)
+ls129clean = sapply(ls129c, function(x) head(x,1))
+ls92 = ls0[130:length(ls0)]
+ls92c = strsplit(ls92, split= " ", fixed = T)
+ls92clean = sapply(ls92c, function(x) head(x,1))
+
+bamls = c(ls129clean, ls92clean)                # modified name
+
+rmcigar = c("N", "P", "=", "X")           # discard 4
+rmcigarID = c("I", "D")                   # ID
 
 mat=data.frame()
 
-  for(i in 1:length(subls)){
-    
-    
-    ah <- read.csv(subls[i], stringsAsFactors = FALSE)
-    
-    qfiles<-ah$File[1:4]
-    qNin<-sum(!is.na(ah$insert))
-    qNdel<-sum(!is.na(ah$deletion))
-    qNnull<-sum(!is.na(ah$zero))
-    qNout<-sum(!is.na(ah$quality))
-    qNTotal<-sum(qNin, qNdel, qNnull, qNout)
-
-    qPin<-qNin/qNTotal*100
-    qPdel<-qNdel/qNTotal*100
-    qPnull<-qNnull/qNTotal*100
-    qPout<-qNout/qNTotal*100
-
-    qMeq<-mean(ah$quality)
-    qMxq<-max(ah$quality)
-    qMnq<-min(ah$quality)
-    
-    qDF <- data.frame(qfiles[1], qfiles[2], qfiles[3], qfiles[4], 
-                      qNTotal, qPin, qPdel, qPnull, qPout, 
-                      qMxq, qMnq, qMeq)
-    mat=rbind(mat, qDF)
-    
+for (i in 1: length( list.files(getwd())  ) ){
+  
+  
+  r.bam <- scanBam(BamFile( ls0[i] ))
+  
+  read.no =  length( r.bam[[1]]$seq )
+  
+  lcigar = strsplit( r.bam[[1]]$cigar, split ="" )
+  
+  rml1 = which( unlist(lapply(lcigar, function(x){any(rmcigar %in% x)})) == TRUE ) 
+  rmlNPX = length(rml1)
+  
+  rml2 = which( unlist(lapply(lcigar, function(x){any(rmcigarID %in% x)})) == TRUE ) 
+  rmlID = length(rml2)
+  
+  rml3 = which( r.bam[[1]]$pos > 3000 ) 
+  rmlPos = length(rml3)
+  
+  rmlT = length( unique(c(rml1, rml2, rml3)) )
+  
+  mappedP = ( rmlT/read.no )*100
+  
+  
+  mat.i = data.frame(bamls[i], ls0[i], read.no, rmlNPX, rmlID, rmlPos, rmlT, mappedP)  
+  mat = rbind(mat, mat.i)
+  
+  print(bamls[i])
+  
 }
-    colnames(mat) <- c("File1", "File2", "File3", "File4", "TotalReads", "PIn", "PDel", "PNull", "PReadIn", "MaxQ", "MinQ", "MeanQ")
-    write.csv(mat, "QC.csv")
-    
 
-        
+
+write.csv(mat, "/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Reads.csv")
+
+
     
 #Assay the deepness of the summarized data   --------------------------
     
