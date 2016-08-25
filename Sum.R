@@ -187,7 +187,7 @@ for(i in 1:length(subls)){
   b500 = length(which(ah.csum < 500))
   b1000 = length(which(ah.csum < 1000))
   
-  mati = data.frame(subls[i], Max, Min, Mean, Q[1], Q[2], Q[3], Q[4], Zero, b500, b1000)
+  mati = data.frame(subls[i], Max, Min, Mean, Q[1], Q[2], Q[3], Q[4], Q[5],Zero, b500, b1000)
   mat = rbind(mat, mati) 
   
   print(subls[i])  
