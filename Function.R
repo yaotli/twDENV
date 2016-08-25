@@ -956,7 +956,7 @@ conSUM<-function(ls, nr){
    
    mx=split(mx, rep(1:ncol(mx), each = nrow(mx)))
    
-   write.fasta(mx, names=c(1: length(ls)), file.out="mx.fasta",
+   write.fasta(mx, names=ls, file.out="mx.fasta",
                nbchar = max(sapply(a, function(x) length(x))))
   
    return(mx)
