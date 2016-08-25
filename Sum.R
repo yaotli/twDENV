@@ -164,31 +164,41 @@ for (i in 1: length( list.files(getwd())  ) ){
 write.csv(mat, "/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Reads.csv")
 
 
-    
-#Assay the deepness of the summarized data   --------------------------
-    
-setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/allDseq/SUM")
+##### Evaluation of the depth with the SUM data #####
+##
+
+setwd("/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/bam/SUM")
 subls <-list.files(getwd())
 
-mat<-matrix(ncol=3000)
+mat = data.frame()
 
 for(i in 1:length(subls)){
- 
-  matt=matrix(ncol=3000)
-  ah <- read.csv(subls[i])
   
-  for(k in 3:length(ah)){
-    
-    tck<-sum(ah[,k][1], ah[,k][2], ah[,k][3], ah[,k][4])
-    matt[,k-2]=tck
-  }
+  ah0 <- read.csv(subls[i])
+  ah = ah0[,904:2505]
+  ah.csum = as.vector(apply(ah, 2, sum))
   
-  mat=rbind(mat, matt) 
+  Max = max(ah.csum[which(ah.csum > 0)])
+  Min = min(ah.csum[which(ah.csum > 0)])
+  Mean = mean(ah.csum[which(ah.csum > 0)])
+  Q = as.vector(quantile(ah.csum[which(ah.csum > 0)]))
   
+  Zero = length(which(ah.csum == 0))
+  b500 = length(which(ah.csum < 500))
+  b1000 = length(which(ah.csum < 1000))
+  
+  mati = data.frame(subls[i], Max, Min, Mean, Q[1], Q[2], Q[3], Q[4], Zero, b500, b1000)
+  mat = rbind(mat, mati) 
+  
+  print(subls[i])  
 }
 
-mat=mat[-1,]
-write.csv(mat, "Deep.csv")
+
+write.csv(mat, "/data/usrhome/LabCCKing/ccking01/Desktop/Ko_DENV/Depth.csv")
+
+
+
+
 
 #generate the figure ----------------------
 
