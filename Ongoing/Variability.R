@@ -1,8 +1,94 @@
-#setwd("/Users/yaosmacbook/twDENV/allSUM")
+########## General Data preparation ##############
+#
 
-lsfull <- c(list.files(getwd())[213:221], list.files(getwd())[1:212])
-ls0102 <- c(list.files(getwd())[213:221], list.files(getwd())[1:129])
-ls05 <- c(list.files(getwd())[130:212])
+ls0 = list.files(getwd())                                 # allSUM folder
+allSUM = do.call("rbind", lapply(ls0, read.csv))          # dim(allSUM)
+
+##### Probe out all variant by Poisson method #####
+#
+# variantPT 
+# lsvariantPT (df, pc, nr, adjER, listname)
+
+adjER = rep(0.001, 3000)
+
+  out.lsv.0.01.1000r = lsvariantPT(allSUM, 0.01, 3, adjER, ls0)
+  out.lsv.0.001.1000r = lsvariantPT(allSUM, 0.001, 3, adjER, ls0) # DV1461, DV1464 n = 0  
+
+  df.out.lsv.0.01.1000r = do.call("rbind", out.lsv.0.01.1000r)
+  df.out.lsv.0.001.1000r = do.call("rbind", out.lsv.0.001.1000r)
+  
+      id = sapply(strsplit(attributes(df.out.lsv.0.01.1000r)$row.names, split = ".", fixed = T), function(x) head(x,1))
+      id = sapply(strsplit(attributes(df.out.lsv.0.001.1000r)$row.names, split = ".", fixed = T), function(x) head(x,1))
+
+  df.out.lsv.0.01.1000r = cbind(id, df.out.lsv.0.01.1000r)
+  df.out.lsv.0.001.1000r = cbind(id, df.out.lsv.0.001.1000r)
+
+##### plot with position #####
+#
+  
+      bk = seq(900, 2500, by=50)
+  
+ggplot(df.out.lsv.0.001.1000r, aes(sVarN, (pVarN), color= id)) + geom_point() + 
+  
+      theme_bw() + theme(legend.position="none") + scale_x_continuous(breaks=bk) + 
+  
+      xlab("Position") + ylab("Proportion") 
+  
+
+##### Variant disribution #####
+#
+
+out.v.m3e.3er = as.data.frame(table(df.out.lsv.0.001.1000r$sVarN))
+
+      out.v.m3e.3er.OD = out.v.m3e.3er[order(-out.v.m3e.3er$Freq),]
+      
+ggplot(out.v.m3e.3er, aes(x=as.numeric(as.character(Var1)), y=Freq)) +
+
+      geom_point() + theme_bw() + scale_x_continuous(breaks=bk) + xlab("Position") +
+  
+      geom_line()
+  
+
+##### Close examination #####
+
+library(dplyr)
+
+ a=     df.out.lsv.0.001.1000r %>%
+        
+        select(pVarN)
+
+
+##### Fit to Distribution #####
+ 
+library(fitdistrplus)
+
+plotdist(a$pVarN, histo = T, demp = T)
+descdist(a$pVarN, boot = 1000)  
+
+fw<-fitdist(a$pVarN, "weibull")  
+fln<-fitdist(a$pVarN, "lnorm") 
+fg<-fitdist(a$pVarN, "gamma")    # summary(fg) 
+
+image(as.matrix(leg),col=cx,axes=T)
+par(mfrow = c(2,2))
+plot.legend = c("Weibull", "lognormal", "Gamma")
+
+denscomp(list(fw, fln, fg), legendtext = plot.legend)
+qqcomp(list(fw, fln, fg), legendtext = plot.legend)
+cdfcomp(list(fw, fln, fg), legendtext = plot.legend)
+ppcomp(list(fw, fln, fg), legendtext = plot.legend)
+
+  x = rgamma(100000, shape = 0.4315147, rate = 9.9349651)
+  plot(density(a$pVarN), lwd = 2) 
+  lines(density(x), col="Red", lwd=2)
+  
+  qgamma(0.05, shape = 0.4315147, rate = 9.9349651, lower.tail = FALSE)
+  # 0.175765
+  
+
+# lsfull <- c(list.files(getwd())[213:221], list.files(getwd())[1:212])
+# ls0102 <- c(list.files(getwd())[213:221], list.files(getwd())[1:129])
+# ls05 <- c(list.files(getwd())[130:212])
 
 ################ 1 C0 sample vs C1 ----------------------------------------------------
 
