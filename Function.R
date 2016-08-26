@@ -192,9 +192,9 @@ lsvariant<-function(ls, pc, nr){
 }
 
 
-#2.3 PT version of dvariant
+#2.3 Poisson test (PT) version of dvariant
 
-variantPT <- function(df, pc, nr){
+variantPT <- function(df, pc, nr, adjER){
   
   library(dplyr)
   
@@ -255,16 +255,31 @@ variantPT <- function(df, pc, nr){
 
 #2.4 ls of variantPT
 
-lsvariantPT <- function(pc, nr){
+lsvariantPT <- function(df, pc, nr, adjER, listname){
+                                                # data source: cSUM
   
-  # data source: cSUM
+  LSi = split(df, rep(1:length(listname), each = 5))
   
-  LSi = split(cSUM, rep(1:221, each = 5))
+  VR = do.call("rbind" , lapply(LSi, variantPT, pc=pc, nr=nr, adjER=adjER))
   
-  VR = do.call("rbind" , lapply(LSi, variantPT, pc=pc, nr=nr))
+  n0 = attributes(VR)$row.names
+  n1 = strsplit(n0, split=".", fixed=T)
+  n1 = as.numeric(sapply(n1, function(x) head(x,1)))
+  tt = as.vector(table(cut(n1, breaks=c(1:(length(listname)+1)), right=FALSE)))
   
-  return(VR)
+  dd = data.frame(tt, listname)
+  nn = do.call("c", apply(dd, 1, function(x){ 
+    
+    time = as.numeric(x[1])
+    name = as.character(x[2])
+    rr = rep(name, time)
+    return(rr)      }) )
   
+  
+  VRn = split(VR, nn)
+  
+  return(VRn)
+  print( listname[which(tt == 0)] )
 }
 
 
