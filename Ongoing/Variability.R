@@ -67,7 +67,8 @@ descdist(a$pVarN, boot = 1000)
 
 fw<-fitdist(a$pVarN, "weibull")  
 fln<-fitdist(a$pVarN, "lnorm") 
-fg<-fitdist(a$pVarN, "gamma")    # summary(fg) 
+fg<-fitdist(a$pVarN, "gamma")    # summary(fln): meanlog -4.642470; sdlog 1.561318
+fp<-fitdist(a$pVarN, "pois", method = "mme")
 
 image(as.matrix(leg),col=cx,axes=T)
 par(mfrow = c(2,2))
@@ -78,14 +79,19 @@ qqcomp(list(fw, fln, fg), legendtext = plot.legend)
 cdfcomp(list(fw, fln, fg), legendtext = plot.legend)
 ppcomp(list(fw, fln, fg), legendtext = plot.legend)
 
+# Gamma and Lognormal
+
   x = rgamma(100000, shape = 0.4315147, rate = 9.9349651)
+  y = rlnorm(100000, meanlog = -4.642470, sdlog = 1.561318)
   plot(density(a$pVarN), lwd = 2) 
   lines(density(x), col="Red", lwd=2)
   
   qgamma(0.05, shape = 0.4315147, rate = 9.9349651, lower.tail = FALSE)
   # 0.175765
   
-
+  qlnorm(0.05, meanlog = -4.642470, sdlog = 1.561318, lower.tail = FALSE)
+  # 0.1256405
+  
 # lsfull <- c(list.files(getwd())[213:221], list.files(getwd())[1:212])
 # ls0102 <- c(list.files(getwd())[213:221], list.files(getwd())[1:129])
 # ls05 <- c(list.files(getwd())[130:212])
