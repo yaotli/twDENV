@@ -1,9 +1,22 @@
 ########## General Data preparation ##############
 #
 
-ls0 = list.files(getwd())                                 # allSUM folder
-allSUM = do.call("rbind", lapply(ls0, read.csv))          # dim(allSUM)
+ls0 = list.files(getwd())                                 # allSUM folder files name
+  allSUM = do.call("rbind", lapply(ls0, read.csv))        # 
 
+ls.raw                                                    # ordered file name
+  ls.clean                                                # ordered ID
+  
+no.c0                   # no. of c0 in ls.raw
+  ls.raw.c0             # C0 files name in ls.raw
+  ls.clean.c0 = ls.clean[no.c0]
+  allSUM.c0 = do.call("rbind", lapply(ls.raw.c0, read.csv))
+  
+no.c1
+  ls.raw.c1
+  ls.clean.c1 = ls.clean[no.c1]
+  allSUM.c1 = do.call("rbind", lapply(ls.raw.c1, read.csv))
+ 
 ##### Probe out all variant by Poisson method #####
 #
 # variantPT 
@@ -12,8 +25,13 @@ allSUM = do.call("rbind", lapply(ls0, read.csv))          # dim(allSUM)
 adjER = rep(0.001, 3000)
 
   out.lsv.0.01.1000r = lsvariantPT(allSUM, 0.01, 3, adjER, ls0)
-  out.lsv.0.001.1000r = lsvariantPT(allSUM, 0.001, 3, adjER, ls0) # DV1461, DV1464 n = 0  
-
+  out.lsv.0.001.1000r = lsvariantPT(allSUM, 0.001, 3, adjER, ls0) 
+  
+  out.lsv.0.001.1000r.c0 = lsvariantPT(allSUM.c0, 0.001, 3, adjER, ls.clean.c0)
+  out.lsv.0.001.1000r.c1 = lsvariantPT(allSUM.c1, 0.001, 3, adjER, ls.clean.c1)
+  
+  
+  
   df.out.lsv.0.01.1000r = do.call("rbind", out.lsv.0.01.1000r)
   df.out.lsv.0.001.1000r = do.call("rbind", out.lsv.0.001.1000r)
   
@@ -48,6 +66,68 @@ ggplot(out.v.m3e.3er, aes(x=as.numeric(as.character(Var1)), y=Freq)) +
   
       geom_line()
   
+
+##### heatmap #####
+#
+# 1 list 
+
+ls.raw = c(ls0[213:221], ls0[1:212])                # ordered ls0
+
+ls.clean = gsub("SUM", replacement = "", ls.raw)
+ls.clean = gsub(".csv", replacement = "", ls.clean) # ls.claen
+
+c1 = sapply(strsplit(ls.clean, split = "_", fixed = T), function(x){length(x) >1})
+no.c1 = which(c1 == "TRUE")  # n = 70
+no.c0 = which(c1 == "FALSE") # n = 151, therefore
+
+ls.raw.c0 = ls.raw[no.c0]
+ls.raw.c1 = ls.raw[no.c1]
+
+#
+# 2 lspvariantPT (df, pc, nr, kd, b, adjER, filenames)
+
+breaks = seq(930, 2430, by=5)
+
+
+out.p.0.001.1000r.c0 = lspvariantPT(allSUM.c0, 0.001, 3, 0, breaks, adjER, ls.clean.c0)
+out.p.0.001.1000r.c1 = lspvariantPT(allSUM.c1, 0.001, 3, 0, breaks, adjER, ls.clean.c1)
+  
+#
+# 3 ggplotting 
+
+breaks = seq(930, 2430, by=5)                 # length(breaks) = 301
+ticks<-out.p.0.001.1000r.c0$region[1:300]     # originally what showed
+ticksss<-ticks[seq(5,295, by=10)]             # the place we preferred to replace
+ticklab<-seq(950, 2400, by=50)
+
+# c0
+  ggplot(out.p.0.001.1000r.c0, aes(region, no.sample)) + 
+    
+    geom_tile(aes(fill=Freq), colour="white") +  theme(legend.position="none") +
+  
+    scale_fill_gradient(low="white", high="Blue") + 
+  
+  theme(axis.text.x=element_text(angle=90, vjust = 0.5)) +
+    
+    scale_y_continuous(breaks = c(1:151), labels = ls.clean.c0) + 
+    
+    xlab("Position") + ylab("Sample") + scale_x_discrete(breaks=ticksss, labels=ticklab)
+
+# c1 
+  ggplot(out.p.0.001.1000r.c1, aes(region, no.sample)) + 
+    
+    geom_tile(aes(fill=Freq), colour="white") +  theme(legend.position="none") +
+    
+    scale_fill_gradient(low="white", high="green") + 
+    
+    theme(axis.text.x=element_text(angle=90, vjust = 0.5)) +
+    
+    scale_y_continuous(breaks = c(1:70), labels = ls.clean.c1) + 
+    
+    xlab("Position") + ylab("Sample") + scale_x_discrete(breaks=ticksss, labels=ticklab)
+  
+
+
 
 ##### Close examination #####
 
