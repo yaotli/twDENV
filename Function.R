@@ -247,7 +247,13 @@ variantPT <- function(df, pc, nr, adjER){
     
   }
   
-  rb<-data.frame(sVarN, VarN, refN, pVarN)
+  if( length(sVarN) == 0 ){
+    sVarN = 0
+    VarN = "NA"
+    refN = "NA"
+    pVarN = 0 } 
+  
+  rb<-data.frame(sVarN, VarN, refN, pVarN) 
   return(rb)
   
   
@@ -279,7 +285,6 @@ lsvariantPT <- function(df, pc, nr, adjER, listname){
   VRn = split(VR, nn)
   
   return(VRn)
-  print( listname[which(tt == 0)] )
 }
 
 
@@ -801,67 +806,65 @@ pvariantAA.E<-function(ls, pc, nr, kd){ #kd = kind: 1 = position, 2 = all varian
 
 #3.8 Poisson test for pvariant
 
-pvariantPT<-function(ls, b, pc, nr, kd){ #kd = kind: 1 = position, 2 = all variant, 
+pvariantPT<-function(df, pc, nr, kd, b, adjER){ 
   
-  # b = breaks, ex: breaks = seq(930, 2430, by=30)
+  # kd = kind: 1 = position, 0 = all variant, 
+  # b = breaks, ex: breaks = seq(930, 2430, by=5)
   # pc = p value ex: 0.05, 0.01, 0.001
-  
-  mx  = c()
-  nrv = c(0, 500, 1000, 2000, 2500)      #1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
+  # for nr: 1 = 0; 2 = 500; 3 = 1000; 4 = 2000; 5 = 2500
   
   library(dplyr)
   
-  for (k in 1:length(ls)){  #each file
-    
-    variantc = c()
-    dddf<-read.csv(ls[k])
-    lth = length(dddf)
-    
-    for(i in 3: lth){                           #each position
-      
-      ii = i - 2 
-      
-      vc = as.vector(dddf[,i])
-      vc = data.frame(vc)
-      
-      tcc = sum(vc[,1][1:4])                         # nr
-      
-      if ( tcc >= nrv[nr] ){
-        
-        mm = max(vc[,1])
-        tcc0 = sum(vc[,1])                         
-        pp = qpois(pc, tcc0*0.0113, lower.tail = FALSE)
-        
-        
-        NOr =      
-          vc %>%
-          filter(vc != mm) %>%
-          filter(vc > pp ) %>%
-          nrow()        
-        
-        if (NOr > 0){ variantc = c(variantc, rep(ii, NOr)) }        
-      } 
-      
-    }
-    
-    if (kd > 0){
-      
-      variantc = unique(variantc)
-      
-      region<-cut(variantc, b, right = FALSE)
-      region<-data.frame(k, table(region))
-      mx = rbind(mx, region)    } else {
-        
-        region<-cut(variantc, b, right = FALSE)
-        region<-data.frame(k, table(region))
-        mx = rbind(mx, region)
-        
-      }
-    
-    print((k/length(ls))*100) 
-  }
+  # need adjER from ErrorRate.R
   
-  return(mx)}
+  nrv = c(0, 500, 1000, 2000, 2500)     
+  
+  sVarN <- c()
+  
+  for(i in 3: length(df)){                           # each position
+    
+    ii = i - 2 
+    
+    vc = as.vector(df[,i])
+    vc = data.frame(vc)
+    
+    tcc = sum(vc[,1][1:4])                         # nr
+    
+    if ( tcc >= nrv[nr] ){
+      
+      mm = max(vc[,1])
+      tcc0 = sum(vc[,1])                         
+      pp = qpois(pc, tcc0*adjER[ii], lower.tail = FALSE)
+      
+      NOr =      
+        vc %>%
+        filter(vc != mm ) %>%
+        filter(vc > pp  ) %>%
+        nrow()        
+      
+      if (NOr > 0){ sVarN = c(sVarN, rep(ii, NOr)) }        }  }
+  
+  if (length(sVarN) == 0 ){sVarN = 0}
+  
+  
+  if (kd > 0){  
+    
+    sVarN = unique(sVarN)
+    
+    region<-cut(sVarN, b, right = FALSE)
+    region<-data.frame(k, table(region))
+    return(region)
+    
+  } else {
+    
+    region<-cut(sVarN, b, right = FALSE)
+    region<-data.frame(k, table(region))
+    return(region)                    }
+  
+  
+  
+}    
+
 
 
 
