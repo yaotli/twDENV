@@ -852,18 +852,36 @@ pvariantPT<-function(df, pc, nr, kd, b, adjER){
     sVarN = unique(sVarN)
     
     region<-cut(sVarN, b, right = FALSE)
-    region<-data.frame(k, table(region))
+    region<-data.frame(table(region))
     return(region)
     
   } else {
     
     region<-cut(sVarN, b, right = FALSE)
-    region<-data.frame(k, table(region))
+    region<-data.frame(table(region))
     return(region)                    }
   
   
   
 }    
+
+
+#3.9 list of pvariantPT
+lspvariantPT <- function(df, pc, nr, kd, b, adjER, filenames){
+  # data source: cSUM
+  
+  LSi = split(df, rep(1:length(filenames), each = 5))
+  
+  VR = do.call("rbind" , lapply(LSi, pvariantPT, pc=pc, nr=nr, adjER=adjER, kd=kd, b=b))
+  
+  n0 = attributes(VR)$row.names
+  n1 = strsplit(n0, split=".", fixed=T)
+  no.sample= as.numeric(sapply(n1, function(x) head(x,1)))
+  
+  VRn = cbind(VR, no.sample)
+  
+  return(VRn)
+}
 
 
 
