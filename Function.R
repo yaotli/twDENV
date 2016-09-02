@@ -282,6 +282,7 @@ lsvariantPT <- function(df, pc, nr, adjER, listname){
     return(rr)      }) )
   
   
+  nn<-factor(nn, levels=uniqe(nn))
   VRn = split(VR, nn)
   
   return(VRn)
