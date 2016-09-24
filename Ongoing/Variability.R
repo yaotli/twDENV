@@ -184,8 +184,7 @@ ppcomp(list(fw, fln, fg), legendtext = plot.legend)
   
 out.n.c1 = as.numeric( sapply(out.lsv.0.001.1000r.c1, function(x){
       
-         length (which(x$sVarN != 0) )
-   }))
+         length (which(x$sVarN != 0) )   }))
   
 
 df.c0c1 = data.frame(ID=c(ls.clean.c0, ls.clean.c1), no=c(out.n.c0, out.n.c1),
@@ -208,6 +207,34 @@ p=pirateplot(formula = no ~ c0c1, data = df.c0c1, theme.o = 3,
 
 box(which = "p")
 
+
+# No contamination version (9/24)
+#
+
+# contami = as.character(c(5083, 5086, 5145, 5184, 5146, 5110, 5152, 5181, 5005, 5059, 5099, 5071,
+#                         5111, 5183, 5102, 5177, 5118, 5196, 5009, 5151, 5180))
+# no.contami = match(contami, ls.clean.c0)
+# no.contami = sort(no.contami)
+#
+# df.c0c1 = data.frame(ID=c(ls.clean.c0, ls.clean.c1), no=c(out.n.c0, out.n.c1),
+# c0c1=c(rep("c0", length(ls.clean.c0)), rep("c1", length(ls.clean.c1))))  
+
+
+
+  ls.clean.c0.Dcon = ls.clean.c0[-no.contami]
+  out.n.c0.Dcon = out.n.c0[-no.contami]
+  
+  df.c0c1.Dcon = data.frame(ID=c(ls.clean.c0.Dcon, ls.clean.c1), no=c(out.n.c0.Dcon, out.n.c1),
+                       c0c1=c(rep("c0", length(ls.clean.c0.Dcon)), rep("c1", length(ls.clean.c1))))  
+  
+  
+  p1=pirateplot(formula = no ~ c0c1, data = df.c0c1.Dcon, theme.o = 3, 
+               main="All samples available", inf = "ci", inf.o = 0.6,
+               xlab="", ylab="No. of Variants", gl.col = gray(.8),
+               pal="basel")
+  
+  box(which = "p")
+  
 
 ##### paired C0 vs C1 #####
 #
@@ -233,6 +260,20 @@ p=pirateplot(formula = no ~ c0c1, data = df.c0c1.p, theme.o = 3,
              pal="basel")
 
 box(which = "p")
+
+## No contamination 
+#
+
+d = c(64, 129)
+df.c0c1.p.Dcon = df.c0c1.p[-d,]  # 8034
+
+  p = pirateplot(formula = no ~ c0c1, data = df.c0c1.p.Dcon, theme.o = 3, 
+             main="Paired Samples", inf = "ci", inf.o = 0.6,
+             xlab="", ylab="No. of Variants", gl.col = gray(.8),
+             pal="basel")
+
+  box(which = "p")
+
 
 # High frequency variant 
 #
@@ -276,6 +317,23 @@ ggplot(data=df.c0c1.p.hfv.pattern15,
   theme_bw() + geom_point() + xlab("")
 
 
+## No Contamination 
+#
+# df.c0c1.p.Dcon
+
+
+p.c1mc0 = df.c0c1.p.Dcon$no[65:128] - df.c0c1.p.Dcon$no[1:64]
+df.p.c1mc0 = data.frame(p.c1mc0, id=1)
+
+p = pirateplot(formula = p.c1mc0 ~ id, data = df.p.c1mc0, theme.o = 3, 
+           main="C1 - C0", inf = "ci", inf.o = 0.6,
+           xlab="", ylab="No. of Variants", gl.col = gray(.8),
+           pal="basel")
+
+box(which = "p")
+
+
+
 ########## Onset day and DHF ##########
 #
 # out.n.c0M
@@ -305,12 +363,36 @@ tt = TpIllnessO
 c0.dhfonset = data.frame(c0.dhfonset, TpIllnessO)
 
 
-pirateplot(formula = out.n.c0M ~ DHF + Outbreak, data = c0.dhfonset, theme.o = 3, 
+p1=pirateplot(formula = out.n.c0M ~ DHF + Outbreak, data = c0.dhfonset, theme.o = 3, 
            main="All sample",inf = "ci", inf.o = 0.6,
            ylab="No. of position with variants", gl.col = gray(.8),
            pal="basel")
 
+box(which = "p1")
+
+
+
+##### Eliminate Contamination (9/24)
+#
+# adjc0.table
+
+c0.dhfonset.Dcon.3.15 = 
+  c0.dhfonset.Dcon.2 %>%
+  filter(DHF != ".") %>%
+  filter(Outbreak == 2) %>%
+  filter(TpIllness != ".") %>%
+  select(out.n.c0, TpIllness, DHF, TpIllnessO)
+
+# TpIllnessO = factor(adjc0.table$TpIllness, levels = c(1:14))
+# c0.dhfonset.Dcon.2 = data.frame(adjc0.table, TpIllnessO)
+
+p=pirateplot(formula = out.n.c0 ~ TpIllnessO + DHF, data = c0.dhfonset.Dcon.3.15, theme.o = 3, 
+              main="15",inf = "ci", inf.o = 0.6,
+              ylab="No. of position with variants", gl.col = gray(.8),
+              pal="basel")
+
 box(which = "p")
+
 
 
 
@@ -329,6 +411,16 @@ coEpitime0102 =
 ggplot(data = coEpitime, aes(x=DoSampling, y=out.n.c0M, 
                              color=as.character(Outbreak)) ) + geom_point()
 
+## Correction (9/24)
+#
+
+c0.Epitime.Dcon = 
+  c0.dhfonset.Dcon.2 %>%
+  filter(DoSampling  != ".") %>%
+  select(out.n.c0, DoSampling, Outbreak)
+
+ggplot(data = c0.Epitime.Dcon, aes(x=DoSampling, y=out.n.c0, 
+                             color=as.character(Outbreak)) ) + geom_point()
 
 
 ########## Repeated Sample ##########
@@ -430,10 +522,7 @@ output = data.frame()
     scale_y_continuous(breaks = c(0:8), labels = c(0:8)) + 
     
     xlab("Position") + ylab("Onset Date") + scale_x_discrete(breaks=ticksss, labels=ticklab)
-  
- 
 
- 
  
 # breaks = seq(930, 2430, by=5)                 # length(breaks) = 301
 # ticks<-out.p.0.001.1000r.c0$region[1:300]     # originally what showed
