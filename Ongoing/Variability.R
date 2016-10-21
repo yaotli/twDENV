@@ -2,18 +2,18 @@
 #
 
 ls0 = list.files(getwd())                                 # allSUM folder files name
-  allSUM = do.call("rbind", lapply(ls0, read.csv))        # 
+  allSUM = do.call("rbind", lapply(ls0, read.csv))        # n = 221
 
-ls.raw                                                    # ordered file name
-  ls.clean                                                # ordered ID
+ls.raw                                                    # ordered file name (n = 221)
+  ls.clean                                                # ordered ID (n = 221, ID only)
   
-no.c0                   # no. of c0 in ls.raw
+no.c0                   # no. of c0 in ls.raw             # n = 151
   ls.raw.c0             # C0 files name in ls.raw
   ls.clean.c0 = ls.clean[no.c0]
   allSUM.c0 = do.call("rbind", lapply(ls.raw.c0, read.csv))
   
 no.c1
-  ls.raw.c1
+  ls.raw.c1                                               # n = 70
   ls.clean.c1 = ls.clean[no.c1]
   allSUM.c1 = do.call("rbind", lapply(ls.raw.c1, read.csv))
  
@@ -24,27 +24,32 @@ no.c1
 
 adjER = rep(0.001, 3000)
 
-  out.lsv.0.01.1000r = lsvariantPT(allSUM, 0.01, 3, adjER, ls0)
-  out.lsv.0.001.1000r = lsvariantPT(allSUM, 0.001, 3, adjER, ls0) 
+  # out.lsv.0.01.1000r = lsvariantPT(allSUM, 0.01, 3, adjER, ls0)
+  out.lsv.0.001.1000r = lsvariantPT(allSUM, 0.001, 3, adjER, ls0)  # n = 221, not in order
   
-  out.lsv.0.001.1000r.c0 = lsvariantPT(allSUM.c0, 0.001, 3, adjER, ls.clean.c0)
+  # ID DV1461 (71), DV1464 (73): 0 variants
+  
+      df.out.lsv.0.01.1000r = do.call("rbind", out.lsv.0.01.1000r) 
+      df.out.lsv.0.001.1000r = do.call("rbind", out.lsv.0.001.1000r)
+  
+  out.lsv.0.001.1000r.c0 = lsvariantPT(allSUM.c0, 0.001, 3, adjER, ls.clean.c0) # ordered 
   out.lsv.0.001.1000r.c1 = lsvariantPT(allSUM.c1, 0.001, 3, adjER, ls.clean.c1)
   
-  df.out.lsv.0.01.1000r = do.call("rbind", out.lsv.0.01.1000r)
-  df.out.lsv.0.001.1000r = do.call("rbind", out.lsv.0.001.1000r)
-  
-      id = sapply(strsplit(attributes(df.out.lsv.0.01.1000r)$row.names, split = ".", fixed = T), function(x) head(x,1))
-      id = sapply(strsplit(attributes(df.out.lsv.0.001.1000r)$row.names, split = ".", fixed = T), function(x) head(x,1))
+    #  id = sapply(strsplit(attributes(df.out.lsv.0.01.1000r)$row.names, split = ".", fixed = T), function(x) head(x,1))
+    #  id = sapply(strsplit(attributes(df.out.lsv.0.001.1000r)$row.names, split = ".", fixed = T), function(x) head(x,1))
 
-  df.out.lsv.0.01.1000r = cbind(id, df.out.lsv.0.01.1000r)
-  df.out.lsv.0.001.1000r = cbind(id, df.out.lsv.0.001.1000r)
+          df.out.lsv.0.01.1000r = cbind(id, df.out.lsv.0.01.1000r)
+          df.out.lsv.0.001.1000r = cbind(id, df.out.lsv.0.001.1000r)
 
 ##### plot with position #####
 #
-  
-      bk = seq(900, 2500, by=50)
-  
-ggplot(df.out.lsv.0.001.1000r, aes(sVarN, (pVarN), color= id)) + geom_point() + 
+      library(ggplot2)
+      bk = seq(900, 2500, by=50)  
+          
+      which ( df.out.lsv.0.001.1000r$pVarN == 0 )
+      
+    
+ggplot( df.out.lsv.0.001.1000r[-c(656,662),] , aes(sVarN, (pVarN), color= id)) + geom_point() + 
   
       theme_bw() + theme(legend.position="none") + scale_x_continuous(breaks=bk) + 
   
@@ -56,9 +61,9 @@ ggplot(df.out.lsv.0.001.1000r, aes(sVarN, (pVarN), color= id)) + geom_point() +
 
 out.v.m3e.3er = as.data.frame(table(df.out.lsv.0.001.1000r$sVarN))
 
-      out.v.m3e.3er.OD = out.v.m3e.3er[order(-out.v.m3e.3er$Freq),]
+      # out.v.m3e.3er.OD = out.v.m3e.3er[order(-out.v.m3e.3er$Freq),]
       
-ggplot(out.v.m3e.3er, aes(x=as.numeric(as.character(Var1)), y=Freq)) +
+ggplot(out.v.m3e.3er[-1,], aes(x=as.numeric(as.character(Var1)), y=Freq)) +
 
       geom_point() + theme_bw() + scale_x_continuous(breaks=bk) + xlab("Position") +
   
@@ -181,14 +186,12 @@ ppcomp(list(fw, fln, fg), legendtext = plot.legend)
 # out.n.c1.p
 # df.c0c1
 # df.c0c1.p
-  
-out.n.c1 = as.numeric( sapply(out.lsv.0.001.1000r.c1, function(x){
-      
-         length (which(x$sVarN != 0) )   }))
-  
 
-df.c0c1 = data.frame(ID=c(ls.clean.c0, ls.clean.c1), no=c(out.n.c0, out.n.c1),
-                     c0c1=c(rep("c0", length(ls.clean.c0)), rep("c1", length(ls.clean.c1))))  
+    
+# out.n.c1 = as.numeric( sapply(out.lsv.0.001.1000r.c0, function(x){
+#          length (which(x$sVarN != 0) )   })) 
+# df.c0c1 = data.frame(ID=c(ls.clean.c0, ls.clean.c1), no=c(out.n.c0, out.n.c1),
+#                     c0c1=c(rep("c0", length(ls.clean.c0)), rep("c1", length(ls.clean.c1))))  
 
   
 # Pirate plot
@@ -201,7 +204,7 @@ library(yarrr)
   
 
 p=pirateplot(formula = no ~ c0c1, data = df.c0c1, theme.o = 3, 
-             main="All samples available", inf = "ci", inf.o = 0.6,
+             main="All samples available", inf = "ci", inf.o = 0.3,
              xlab="", ylab="No. of Variants", gl.col = gray(.8),
              pal="basel")
 
@@ -212,7 +215,7 @@ box(which = "p")
 #
 
 # contami = as.character(c(5083, 5086, 5145, 5184, 5146, 5110, 5152, 5181, 5005, 5059, 5099, 5071,
-#                         5111, 5183, 5102, 5177, 5118, 5196, 5009, 5151, 5180))
+#                         5111, 5183, 5102, 5177, 5118, 5196, 5009, 5151, 5180)) # n = 21
 # no.contami = match(contami, ls.clean.c0)
 # no.contami = sort(no.contami)
 #
@@ -221,8 +224,8 @@ box(which = "p")
 
 
 
-  ls.clean.c0.Dcon = ls.clean.c0[-no.contami]
-  out.n.c0.Dcon = out.n.c0[-no.contami]
+  ls.clean.c0.Dcon = ls.clean.c0[-no.contami]                       # n = 130 (151 - 21)
+  out.n.c0.Dcon = out.n.c0[-no.contami]                             # note: DV5083
   
   df.c0c1.Dcon = data.frame(ID=c(ls.clean.c0.Dcon, ls.clean.c1), no=c(out.n.c0.Dcon, out.n.c1),
                        c0c1=c(rep("c0", length(ls.clean.c0.Dcon)), rep("c1", length(ls.clean.c1))))  
@@ -239,36 +242,27 @@ box(which = "p")
 ##### paired C0 vs C1 #####
 #
 
-c1 = sapply(strsplit(ls.clean.c1, split = "_", fixed = T), 
-       function(x) head(x,1))
+# c1 = sapply(strsplit(ls.clean.c1, split = "_", fixed = T), 
+#       function(x) head(x,1))
 
-out.n.c1.p = out.n.c1[-which(duplicated(c(ls.clean.c0, c1))[152:221] == "FALSE")]
-         a = c1[-which(duplicated(c(ls.clean.c0, c1))[152:221] == "FALSE")]
-out.n.c0.p = out.n.c0[which(duplicated(c(a, ls.clean.c0))[66:216] == "TRUE")]
-
-df.c0c1.p = data.frame(no=c(out.n.c0.p, out.n.c1.p),
-                       c0c1=c(rep("c0", length(out.n.c0.p)), rep("c1", length(out.n.c1.p))))  
-
+# out.n.c1.p = out.n.c1[-which(duplicated(c(ls.clean.c0, c1))[152:221] == "FALSE")]
+#          a = c1[-which(duplicated(c(ls.clean.c0, c1))[152:221] == "FALSE")]
+# out.n.c0.p = out.n.c0[which(duplicated(c(a, ls.clean.c0))[66:216] == "TRUE")]
+# df.c0c1.p = data.frame(no=c(out.n.c0.p, out.n.c1.p),
+#                       c0c1=c(rep("c0", length(out.n.c0.p)), rep("c1", length(out.n.c1.p))))  
 
 
-# Pirate plot
-#
 
-p=pirateplot(formula = no ~ c0c1, data = df.c0c1.p, theme.o = 3, 
-             main="All samples available", inf = "ci", inf.o = 0.6,
-             xlab="", ylab="No. of Variants", gl.col = gray(.8),
-             pal="basel")
-
-box(which = "p")
+# Pirate plot (paired sample)
 
 ## No contamination 
 #
 
 d = c(64, 129)
-df.c0c1.p.Dcon = df.c0c1.p[-d,]  # 8034
+df.c0c1.p.Dcon = df.c0c1.p[-d,]  # 5083
 
   p = pirateplot(formula = no ~ c0c1, data = df.c0c1.p.Dcon, theme.o = 3, 
-             main="Paired Samples", inf = "ci", inf.o = 0.6,
+             main="Paired Samples (n = 64)", inf = "ci", inf.o = 0.3,
              xlab="", ylab="No. of Variants", gl.col = gray(.8),
              pal="basel")
 
@@ -299,38 +293,28 @@ box(which = "p")
 
 # Freq change
 
+    a=which(out.n.c0.p.hfv == 0)[-6]
+    b=which(out.n.c1.p.hfv == 0)
+    duplicated(c(b,a))
 
-a=which(out.n.c0.p.hfv == 0)[-6]
-b=which(out.n.c1.p.hfv == 0)
-
-duplicated(c(b,a))
-
-
-df.c0c1.p.hfv.pattern15 = data.frame(no=c(out.n.c0.p.hfv[-a], out.n.c1.p.hfv[-a]), sample=rep(1:16,2),
-                              c0c1 = c(rep("C0",16), rep("C1", 16)))
-
-library(ggplot2)
-
-
-ggplot(data=df.c0c1.p.hfv.pattern15, 
-       aes(x=c0c1, y=no, group=sample)) + geom_line(size=1.5) + 
-  theme_bw() + geom_point() + xlab("")
-
+  df.c0c1.p.hfv.pattern15 = data.frame(no=c(out.n.c0.p.hfv[-a], out.n.c1.p.hfv[-a]), 
+                                     sample=rep(1:16,2), 
+                                     c0c1 = c(rep("C0",16), rep("C1", 16)))
 
 ## No Contamination 
 #
 # df.c0c1.p.Dcon
 
 
-p.c1mc0 = df.c0c1.p.Dcon$no[65:128] - df.c0c1.p.Dcon$no[1:64]
-df.p.c1mc0 = data.frame(p.c1mc0, id=1)
+  p.c1mc0 = df.c0c1.p.Dcon$no[65:128] - df.c0c1.p.Dcon$no[1:64]
+  df.p.c1mc0 = data.frame(p.c1mc0, id=1)
 
-p = pirateplot(formula = p.c1mc0 ~ id, data = df.p.c1mc0, theme.o = 3, 
-           main="C1 - C0", inf = "ci", inf.o = 0.6,
+  p = pirateplot(formula = p.c1mc0 ~ id, data = df.p.c1mc0, theme.o = 3, 
+           main="Variation change", inf = "ci", inf.o = 0.3,
            xlab="", ylab="No. of Variants", gl.col = gray(.8),
            pal="basel")
 
-box(which = "p")
+  box(which = "p")
 
 
 
@@ -342,58 +326,64 @@ box(which = "p")
 
 demo = read.csv(file.choose())
 
-out.n.c0M = out.n.c0[-103]        # to remove DENV5083 n = 150
+out.n.c0M = out.n.c0[-103]                    # to remove DENV5083 n = 150
 c0.table = data.frame(demo, out.n.c0M)
 
 # pirate
-#
-
-c0.dhfonset = 
- c0.table %>%
-   filter(DHF != ".") %>%
-    filter(TpIllness != ".") %>%
-    select(out.n.c0M, TpIllness, DHF, Outbreak)
-
-TpIllnessO = factor(c0.dhfonset$TpIllness, levels = c(1:14))
-
-tt = as.numeric(as.character((c0.dhfonset$TpIllness)))
-tt[which(as.numeric(as.character((c0.dhfonset$TpIllness))) > 5)] = 6
-tt = TpIllnessO
-
-c0.dhfonset = data.frame(c0.dhfonset, TpIllnessO)
-
-
-p1=pirateplot(formula = out.n.c0M ~ DHF + Outbreak, data = c0.dhfonset, theme.o = 3, 
-           main="All sample",inf = "ci", inf.o = 0.6,
-           ylab="No. of position with variants", gl.col = gray(.8),
-           pal="basel")
-
-box(which = "p1")
-
 
 
 ##### Eliminate Contamination (9/24)
 #
 # adjc0.table
-
-c0.dhfonset.Dcon.3.15 = 
-  c0.dhfonset.Dcon.2 %>%
-  filter(DHF != ".") %>%
-  filter(Outbreak == 2) %>%
-  filter(TpIllness != ".") %>%
-  select(out.n.c0, TpIllness, DHF, TpIllnessO)
+#
 
 # TpIllnessO = factor(adjc0.table$TpIllness, levels = c(1:14))
 # c0.dhfonset.Dcon.2 = data.frame(adjc0.table, TpIllnessO)
 
-p=pirateplot(formula = out.n.c0 ~ TpIllnessO + DHF, data = c0.dhfonset.Dcon.3.15, theme.o = 3, 
-              main="15",inf = "ci", inf.o = 0.6,
-              ylab="No. of position with variants", gl.col = gray(.8),
+# *** TpIllnessO is problematic; use f and ff instead (OnsetD) (10/22): 
+# *** adjc0.table::DoSampling is incorrect; use p instead (IsoD): 
+#
+#
+
+  f = as.character(adjc0.table$TpIllness)
+  f[60] = 99
+  f = as.numeric(f)
+  
+  ff = f
+  ff[which(ff >= 5)] = 5
+  ff[60] = 99
+  OnsetD = ff
+  
+# 
+  p = adjc0.table$DoSampling
+  p[20:77] = p[20:77] + 365 
+  p = p/365
+  IsoD = p
+#
+  clade0 = read.csv(file.choose(), header = F)
+  match(c0.dhfonset.Dcon.Oct$ID, clade0$V1)
+  
+  cl = c()
+  cl[1:77] = as.character(clade0$V2[match(c0.dhfonset.Dcon.Oct$ID, clade0$V1)[1:77]])
+  cl[78:130] = "III"
+  clade = cl
+   
+#
+  # c0.dhfonset.Dcon.Oct = data.frame(adjc0.table, OnsetD, IsoD, clade)
+
+  c0.dhfonset.Dcon.Oct.15 = 
+    c0.dhfonset.Dcon.Oct %>%
+    filter(DHF != ".") %>%
+    filter(Outbreak == 2) %>%
+    filter(OnsetD != 99) %>%
+    select(ID, out.n.c0, DHF, OnsetD, IsoD, clade)
+  
+p=pirateplot(formula = out.n.c0 ~ OnsetD + DHF, data = c0.dhfonset.Dcon.Oct.15, 
+              theme.o = 3, main="2015 ",inf = "ci", inf.o = 0.2,
+              ylab="No. variants", gl.col = gray(.8),
               pal="basel")
 
 box(which = "p")
-
-
 
 
 ##### Epitime and no.variant #####
@@ -401,26 +391,19 @@ box(which = "p")
 # c0.table
 # coEpitime
 
-
-coEpitime0102 = 
-  c0.table %>%
-  filter(DoSampling  != ".") %>%
-  filter(Outbreak  = 1) %>%
-  select(out.n.c0M, DoSampling)
-
-ggplot(data = coEpitime, aes(x=DoSampling, y=out.n.c0M, 
-                             color=as.character(Outbreak)) ) + geom_point()
-
-## Correction (9/24)
+## Correction (10/22)
 #
+# c0.dhfonset.Dcon.Oct.0102
+# c0.dhfonset.Dcon.Oct.15
 
-c0.Epitime.Dcon = 
-  c0.dhfonset.Dcon.2 %>%
-  filter(DoSampling  != ".") %>%
-  select(out.n.c0, DoSampling, Outbreak)
+a = ggplot(data = c0.dhfonset.Dcon.Oct.0102, 
+           aes(x=IsoD, y=out.n.c0, color = clade)) + geom_point(size = 3) +
+  
+  ylab("No. Variant") + xlab("") + ggtitle("2001-2012") + 
+  theme(axis.title=element_text(size=20), axis.text=element_text(size=18), 
+        plot.title = element_text(size=25)) 
 
-ggplot(data = c0.Epitime.Dcon, aes(x=DoSampling, y=out.n.c0, 
-                             color=as.character(Outbreak)) ) + geom_point()
+multiplot(a,b)
 
 
 ########## Repeated Sample ##########
