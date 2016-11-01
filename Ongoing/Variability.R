@@ -371,16 +371,16 @@ c0.table = data.frame(demo, out.n.c0M)
 #
   # c0.dhfonset.Dcon.Oct = data.frame(adjc0.table, OnsetD, IsoD, clade)
 
-  c0.dhfonset.Dcon.Oct.15 = 
+  c0.dhfonset.Dcon.Oct.0102 = 
     c0.dhfonset.Dcon.Oct %>%
     filter(DHF != ".") %>%
-    filter(Outbreak == 2) %>%
+    filter(Outbreak == 1) %>%
     filter(OnsetD != 99) %>%
-    select(ID, out.n.c0, DHF, OnsetD, IsoD, clade)
+    select(ID, out.n.c0, DHF, OnsetD, IsoD, clade, Secondary)
   
 p=pirateplot(formula = out.n.c0 ~ OnsetD + DHF, data = c0.dhfonset.Dcon.Oct.15, 
-              theme.o = 3, main="2015 ",inf = "ci", inf.o = 0.2,
-              ylab="No. variants", gl.col = gray(.8),
+              theme  = 1, main="2015 ", inf.method = "hdi", inf.f.o = 0.2,
+              ylab="No. variants", gl.col = gray(.8), 
               pal="basel")
 
 box(which = "p")
@@ -399,11 +399,27 @@ box(which = "p")
 a = ggplot(data = c0.dhfonset.Dcon.Oct.0102, 
            aes(x=IsoD, y=out.n.c0, color = clade)) + geom_point(size = 3) +
   
-  ylab("No. Variant") + xlab("") + ggtitle("2001-2012") + 
+  ylab("No. Variant") + xlab("") + ggtitle("2001-2002") + 
   theme(axis.title=element_text(size=20), axis.text=element_text(size=18), 
         plot.title = element_text(size=25)) 
 
 multiplot(a,b)
+
+
+##### Secondary vs Primary Infection ##### 
+#
+# c0.dhfonset.Dcon.Oct.0102
+# c0.dhfonset.Dcon.Oct.15
+
+b=pirateplot(formula = out.n.c0 ~ Secondary, data = c0.dhfonset.Dcon.Oct.15, inf.method ="ci",
+             theme  = 1, main="2015 ", inf.f.o = 0.1, inf.lwd = 0, bar.f.o = 0.1,
+             point.cex = 2, avg.line.lwd = 10,
+             ylab="No. variants", gl.col = gray(.8), 
+             pal="basel")
+
+box(which = "p")
+
+
 
 
 ########## Repeated Sample ##########
