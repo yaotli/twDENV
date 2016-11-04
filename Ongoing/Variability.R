@@ -529,6 +529,40 @@ output = data.frame()
 # ticklab<-seq(950, 2400, by=50) 
 
 
+
+########## 3 residues subpopulation ##########
+#  
+# 1073, 1227, 2064 on E protein
+#  
+#
+  
+# setwd("/Users/yaosmacbook/twDENV/allSUM")
+# setwd("/Users/yaosmacbook/twDENV")
+# ls.raw.c0
+  
+  SiteMx1073.151=vdpon(1073,ls.raw.c0) # C to T
+  SiteMx1227.151=vdpon(1227,ls.raw.c0) # T to A
+  SiteMx2064.151=vdpon(2064,ls.raw.c0) # T to C
+  
+  xaxislabel = gsub("SUM", replacement = "", ls.raw.c0)
+  xaxislabel = gsub(".csv", replacement = "", xaxislabel)
+
+  plot(SiteMx1073.151[,3], xlab = "", ylab = "C1073T", xaxt='n')
+  points(SiteMx1073.151[,2], pch = 16)
+  axis(1, 1:151, xaxislabel,  las=3)
+  
+  plot(SiteMx1227.151[,2], xlab = "", ylab = "T1227A", xaxt='n')
+  points(SiteMx1227.151[,1], pch = 16)
+  axis(1, 1:151, xaxislabel,  las=3)
+  
+  plot(SiteMx2064.151[,2], xlab = "", ylab = "T2064C", xaxt='n')
+  points(SiteMx2064.151[,3], pch = 16)
+  axis(1, 1:151, xaxislabel,  las=3)
+
+  # par(mfrow=c(3,1))
+  
+
+  
   
   
   
