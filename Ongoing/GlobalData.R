@@ -187,14 +187,54 @@ file = read.fasta(file.choose())
   subtreseqLite()
   
   
-  
-  
-  
-  
+##################################################
+##### rePrepare for time 
 
+# input
+  
+  library(seqinr) 
+  
+  file = read.fasta(file.choose())
+  
+  seq.name0 = attributes(file)$names
+  seq0 = getSequence(file)
+  
+  duplicated.id = which(duplicated(seq.name0) == "TRUE") 
+  
+  seq.name0 = gsub("\\(", "-", seq.name0   )
+  seq.name0 = gsub("\\)", "-", seq.name0   )
+  seq.name0 = gsub("\\[", "/", seq.name0   )
+  seq.name0 = gsub("\\]", "/", seq.name0   )
+  seq.name0 = gsub(" ", "_", seq.name0   )
+  seq.name0 = gsub("\\'", "", seq.name0   )
+  seq.name0 = gsub(">", "", seq.name0   )
+  
+# replace ":number..number" 
+  
+  a = "\\:([0-9]+)\\.\\.([0-9]+)\\_"
+  seq.name = gsub(a, "_", seq.name0 )
+  seq.name = gsub("\\/", "-", seq.name ) 
+  
+# deal with year
+  
+  for(i in 1:26){
+    seq.name[i] = paste0(seq.name[i],"0")} # write.csv(seq.name, "a.csv")
+  
+  a = "-([0-9-]+)" 
+  seq.name = gsub(a, "", seq.name)  # grepl(a, seq.name[1130])
 
+  write.fasta(seq0[-(1:26)], file.out = "revised.fasta", names = seq.name[-(1:26)])
   
+  # extract the time 
   
+  install.packages("stringr")
+  library(stringr)
   
+  a = "\\_([0-9]+)"                   #   grepl(a, seq.name)
+  dvtime <- as.numeric(str_match(seq.name, a)[,2])
   
+  a = "\\_([^0-9]+)\\_"                   #   grepl(a, seq.name)
+  # seq.name[which(grepl(a, seq.name) == FALSE)]
+  dvnation <- str_match(seq.name, a)[,2]
+  dvnation[which(grepl(a, seq.name) == FALSE)] = "NA"
   
