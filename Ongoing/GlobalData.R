@@ -152,5 +152,49 @@ file = read.fasta(file.choose())
   
   
   
+##################################################
+##### Subtree extraction
+
+  subtreseqLite<-function(){
+    
+    library(seqinr) 
+    
+    fasta0 = read.fasta(file.choose())
+    seq.name0 = attributes(fasta0)$names
+    seq0 = getSequence(fasta0)
+    bug.id = grep("'", seq.name0)
+    
+    sub.tree=read.csv(file.choose())
+    
+    tipslabel.subtree0 = as.character(sub.tree[,1])
+    startno = which( tipslabel.subtree0 == "\ttaxlabels" ) + 1
+    endno = head( which(tipslabel.subtree0 == ";"), 1 ) - 1
+    
+    tipslabel.subtree = tipslabel.subtree0[ startno:endno ]
+    
+    name.subtree = gsub(pattern = "\t", "", tipslabel.subtree)
+    id.subtree = match(name.subtree, seq.name0)
+    
+    seq.name0.subtree = seq.name0[id.subtree]
+    seq0.subtree = seq0[id.subtree]
+    
+    write.fasta(seq0.subtree, file.out = "subtree.fasta", names = seq.name0.subtree)
+    
+    print("Done")
+    
+  }
+  
+  subtreseqLite()
+  
+  
+  
+  
+  
+  
 
 
+  
+  
+  
+  
+  
