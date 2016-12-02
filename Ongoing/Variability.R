@@ -406,6 +406,23 @@ a = ggplot(data = c0.dhfonset.Dcon.Oct.0102,
 multiplot(a,b)
 
 
+##### lineage and no.variant #####
+#
+# c0.dhfonset.Dcon.Oct.0102
+#
+
+install.packages("yarrr")
+library("yarrr") 
+
+p = pirateplot(formula = out.n.c0 ~ clade, data = c0.dhfonset.Dcon.Oct.0102, 
+           theme = 0, point.cex =  4, point.o = 0.5, avg.line.o = 1,
+           bar.f.o = 0.1, inf.method = "ci",
+           xlab="", ylab = "",
+           cex.lab = 2, cex.axis = 2)
+
+p + title(xlab="Clade", cex.lab=1.5, ylab="No. Variant")
+
+
 ##### Secondary vs Primary Infection ##### 
 #
 # c0.dhfonset.Dcon.Oct.0102
