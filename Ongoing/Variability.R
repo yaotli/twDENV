@@ -422,6 +422,21 @@ p = pirateplot(formula = out.n.c0 ~ clade, data = c0.dhfonset.Dcon.Oct.0102,
 
 p + title(xlab="Clade", cex.lab=1.5, ylab="No. Variant")
 
+fill <- "#4271AE"; lines <- "#1F3552"
+ggplot(c0.dhfonset.Dcon.Oct.0102, aes(x=clade, y=out.n.c0)) + 
+  geom_boxplot(color = lines, fill=fill, size=1.5) + theme_bw() + 
+  xlab("Clade") + ylab("No. Variant") + 
+  scale_y_continuous(breaks = seq(0, 60, 10)) + theme(
+    axis.text.x = element_text(colour="black", size = 20),
+    axis.text.y = element_text(colour="black", size = 20),
+    axis.title = element_text(size=25)
+  )
+  
+
+
+
+
+
 
 ##### Secondary vs Primary Infection ##### 
 #
