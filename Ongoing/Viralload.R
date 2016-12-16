@@ -64,15 +64,64 @@ library(ggplot2)
           axis.text.y = element_text(size = 15), 
           legend.text = element_text(size = 16)) + 
     
-    scale_fill_brewer(palette = "Accent") +
     guides(fill = guide_legend(title=NULL))
 
     
   # Variation vs VL
+  # c0.dhfonset.Dcon.Oct.0102
   
+  db2<- all_qpcr %>%
+    filter(phase != "NA" )  %>%
+    select(ID, VL, clade)
    
+  
+  matchid <- c()
    
-   
+  m = gsub("DEN", "", as.character(c0.dhfonset.Dcon.Oct.0102[,1])) 
+  for(k in 1: length(db2[,1])){
+    
+    if ( length(grep(as.character(db2[,1])[k], m)) == 0 ){
+      
+      matchid[k] = 10000
+      
+    }else{
+      
+      matchid[k] <- grep(as.character(db2[,1])[k], m)
+      
+    }
+    
+  }
+    
+  db2[,4] <- c0.dhfonset.Dcon.Oct.0102$out.n.c0[matchid]
+  db2_a = db2[-which(is.na(db2[,4])),]
+  
+  # dot plot 
+  ggplot(db2_a, 
+         aes(x = log10(VL), y = V4, color = clade)) + 
+    
+    theme_bw() +
+    
+    # with ring-like effect
+    geom_point(color = "black", size = 3.2, alpha = 0.8, shape = 1) + 
+    geom_point(size = 3, alpha = 0.8) + 
+    
+    ylab("Variation") +  
+    
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA, size=1),
+      axis.title = element_text(face="bold"),
+      axis.title.x = element_text(size = 20),
+      axis.title.y = element_text(size = 20),
+      axis.text.x = element_text(size = 15), 
+      axis.text.y = element_text(size = 15), 
+      legend.text = element_text(size = 16),
+      legend.title = element_text(size = 20))
+    
+      
+    
+    
+    
+           
    
    
    
