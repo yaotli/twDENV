@@ -41,7 +41,7 @@ qpcr <- read.csv("~/Desktop/qPCR.csv")
    
    all_qpcr = cbind(all_qpcr, phase_qpcr)
    colnames(all_qpcr)[6] = "phase"
-   
+
    
 library("dplyr")
 library(ggplot2)
@@ -52,7 +52,7 @@ library(ggplot2)
    
   # VL vs Clade   
   ggplot(db1, aes( x = clade, y = log10(VL), fill = phase)) + 
-    geom_boxplot(alpha = 0.6) + 
+    geom_boxplot(alpha = 0.6, size = 1.5) + 
     scale_x_discrete(name = "Clade") + 
     theme_bw() + 
     theme(
@@ -117,9 +117,36 @@ library(ggplot2)
       legend.text = element_text(size = 16),
       legend.title = element_text(size = 20))
     
-      
+   
+  # Temporal pattern of VL
+  
+  db3 <- all_qpcr %>%
+    filter(repeated != "NA" )  %>%
+    filter(onset <= 10) %>%
+    select(repeated, VL, onset, clade)
+  
+  # elimiate repeated 1715 since one time point  
+  db3_b <- db3[-which(db3$repeated == 1715),]
+  
+  ggplot(db3_b, aes(x=onset, 
+                  y=log10(VL), 
+                  color=clade, group=repeated)) + 
     
+    geom_line(size = 1.1) + 
+    geom_point() +
+    facet_wrap(~ repeated) + 
+    scale_x_continuous(breaks = seq(0,10, by = 2)) + 
+    scale_y_continuous(breaks = seq(2,8, by = 2)) + 
+    theme_bw() + 
+    xlab("Onset day") +
+    theme(axis.title.x = element_text(size = 18),
+          axis.title.y = element_text(size = 18),
+          legend.text = element_text(size = 14),
+          legend.title = element_text(size = 14),
+          strip.background = element_rect(fill = "white", color = "white"),
+          strip.text = element_text(size = 11, face = "bold")) +
     
+    scale_color_discrete(name = "Clade")
     
            
    
