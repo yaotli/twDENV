@@ -117,6 +117,46 @@ library(ggplot2)
       legend.text = element_text(size = 16),
       legend.title = element_text(size = 20))
     
+  # classification of viral load
+  
+  dbx<- all_qpcr %>%
+    filter(phase != "NA" )  %>%
+    select(ID, VL, clade, onset)
+  
+  dbx[,5] <- c0.dhfonset.Dcon.Oct.0102$out.n.c0[matchid]
+  dbx_a <- dbx[-which(is.na(dbx[,5])),]
+  
+  # dot plot (onset vs VL)
+  ggplot(dbx_a, 
+         aes(x = onset, y = log10(VL), color = clade)) + 
+    
+    theme_bw() +
+    
+    # with ring-like effect
+    geom_point(color = "black", size = 3.2, alpha = 0.8, shape = 1) + 
+    geom_point(size = 3, alpha = 0.8) + 
+    
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA, size=1),
+      axis.title = element_text(face="bold"),
+      axis.title.x = element_text(size = 20),
+      axis.title.y = element_text(size = 20),
+      axis.text.x = element_text(size = 15), 
+      axis.text.y = element_text(size = 15), 
+      legend.text = element_text(size = 16),
+      legend.title = element_text(size = 20)) 
+  
+  # regressions
+  
+  lm1 = lm(log10(dbx_a$VL) ~ dbx_a$onset)
+  lm2 = lm(log10(dbx_a$VL) ~ dbx_a$V5)
+  lm3 = lm(dbx_a$V5 ~ dbx_a$onset)
+  
+  summary(lm2)
+  
+  # ploty
+  # https://plot.ly/~yaoli/4/ia-ib-ii/
+  
    
   # Temporal pattern of VL
   
