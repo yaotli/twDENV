@@ -50,7 +50,7 @@ library(ggplot2)
      filter(phase != "NA" )  %>%
      select(VL, phase, clade)
    
-  # VL vs Clade   
+  # VL vs Clade   ####
   ggplot(db1, aes( x = clade, y = log10(VL), fill = phase)) + 
     geom_boxplot(alpha = 0.6, size = 1.5) + 
     scale_x_discrete(name = "Clade") + 
@@ -67,7 +67,7 @@ library(ggplot2)
     guides(fill = guide_legend(title=NULL))
 
     
-  # Variation vs VL
+  # Variation vs VL ####
   # c0.dhfonset.Dcon.Oct.0102
   
   db2<- all_qpcr %>%
@@ -116,8 +116,63 @@ library(ggplot2)
       axis.text.y = element_text(size = 15), 
       legend.text = element_text(size = 16),
       legend.title = element_text(size = 20))
+  
+  # Variation vs VL stratified by clade ####
+  
+  p <- ggplot(db2_a, aes(x = V4, 
+                    y = log10(VL), 
+                    color = clade, group = clade)) + 
     
-  # classification of viral load
+    
+    geom_point(color = "black", size = 3.2, alpha = 0.8, shape = 1) + 
+    geom_point(size = 3, alpha = 0.8) + 
+  
+    geom_smooth(method=lm, se = FALSE) +
+    facet_wrap(~ clade, ncol = 1) +
+    theme_bw() +
+    xlab("Variation") +
+    scale_x_continuous(breaks = seq(0, 60, by = 10), 
+                       limits = c(0,60)) + 
+    
+    theme(
+          axis.title = element_text(face="bold"),
+          axis.title.x = element_text(size = 18),
+          axis.title.y = element_text(size = 18),
+          strip.background = element_rect(fill = "white", color = "white"),
+          strip.text = element_text(size = 16, face = "bold"), 
+          legend.position="none"
+          )
+  
+   # lm
+  
+  lm1_db2_a <- lm(log10(db2_a$VL[which(db2_a$clade == "Ia")]) ~ 
+                   db2_a$V4[which(db2_a$clade == "Ia")])
+
+  lm2_db2_a <- lm(log10(db2_a$VL[which(db2_a$clade == "Ib")]) ~ 
+                   db2_a$V4[which(db2_a$clade == "Ib")])
+  
+  lm3_db2_a = lm(log10(db2_a$VL[which(db2_a$clade == "II")]) ~ 
+                   db2_a$V4[which(db2_a$clade == "II")])
+  
+  
+  summary(lm1_db2_a)
+  
+  # add R-square
+  
+  Rlendend <- data.frame( x = rep(50, 3), 
+                          y = rep(7, 3),
+                          clade = c("Ia","Ib","II"),
+                          labs = c('R^2 == 0.05', 'R^2 == 0.68', 'R^2 == 0.55' ))
+  
+  p + geom_text( data = Rlendend,
+                 aes(x, y, 
+                    label = labs, 
+                    group = NULL),
+                parse = TRUE,
+                color = "Black", size = 5)
+  
+    
+  # Stritification of viral load ####
   
   dbx<- all_qpcr %>%
     filter(phase != "NA" )  %>%
@@ -151,14 +206,17 @@ library(ggplot2)
   lm1 = lm(log10(dbx_a$VL) ~ dbx_a$onset)
   lm2 = lm(log10(dbx_a$VL) ~ dbx_a$V5)
   lm3 = lm(dbx_a$V5 ~ dbx_a$onset)
+  lm4 = lm(log10(dbx_a$VL)[ which(dbx_a$onset < 6) ] ~ dbx_a$V5[ which(dbx_a$onset < 6) ])
   
-  summary(lm2)
+  plot(log10(dbx_a$VL)[ which(dbx_a$onset < 6) ] ~ dbx_a$V5[ which(dbx_a$onset < 6) ])
+  
+  summary(lm4)
   
   # ploty
   # https://plot.ly/~yaoli/4/ia-ib-ii/
   
    
-  # Temporal pattern of VL
+  # Temporal pattern of VL ####
   
   db3 <- all_qpcr %>%
     filter(repeated != "NA" )  %>%
