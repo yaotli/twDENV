@@ -433,8 +433,66 @@ ggplot(c0.dhfonset.Dcon.Oct.0102, aes(x=clade, y=out.n.c0)) +
   )
   
 
+# No. of variant vs clade stratified by onset date ####
+#
+# Dataframe used: c0.dhfonset.Dcon.Oct.0102
+# Jan 28, 2017
+# Result: boxplot
+#
+
+OnsetD_C = c()
+
+for (i in 1: length(c0.dhfonset.Dcon.Oct.0102$OnsetD) ){
+  
+  
+  if ( c0.dhfonset.Dcon.Oct.0102$OnsetD[i] <= 3 ){
+    
+    OnsetD_C[i] = "0-3"
+    
+  }
+  
+  if ( c0.dhfonset.Dcon.Oct.0102$OnsetD[i] > 3  ){
+    
+    OnsetD_C[i] = "4-10"
+    
+  }
+  
+}
+  c0.dhfonset.Dcon.Jan.0102 <- cbind(c0.dhfonset.Dcon.Oct.0102, OnsetD_C)
 
 
+# plotting 
+# pirate 
+  
+p<-  pirateplot(formula = out.n.c0 ~ clade + OnsetD_C, data = c0.dhfonset.Dcon.Jan.0102, 
+             theme = 0, point.cex =  2, point.o = 0.5, avg.line.o = 1,
+             bar.f.o = 0.2, inf.method = "ci",
+             xlab="", ylab = "",
+             cex.lab = 1.3, cex.axis = 1)
+  
+  p + title(xlab="", cex.lab=1.5, ylab="No. of Variant")
+
+  
+
+# ggplot - box 
+  
+  ggplot(c0.dhfonset.Dcon.Jan.0102, 
+         aes( x = OnsetD_C, y = out.n.c0, fill = clade)) + 
+    geom_boxplot(alpha = 0.6, size = 1.5) + 
+    scale_x_discrete(name = "Onset") + 
+    scale_y_continuous(name = "No. of Variants") + 
+    
+    theme_bw() + 
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA, size=1),
+      axis.title = element_text(face="bold"),
+      axis.title.x = element_text(size = 20),
+      axis.title.y = element_text(size = 20),
+      axis.text.x = element_text(size = 15), 
+      axis.text.y = element_text(size = 15), 
+      legend.text = element_text(size = 16)) + 
+    
+    guides(fill = guide_legend(title=NULL))
 
 
 
