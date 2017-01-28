@@ -51,18 +51,20 @@ library(ggplot2)
      select(VL, phase, clade)
    
   # VL vs Clade   ####
-  ggplot(db1, aes( x = clade, y = log10(VL), fill = phase)) + 
+ c1 <- ggplot(db1, aes( x = phase, y = log10(VL), fill = clade)) + 
     geom_boxplot(alpha = 0.6, size = 1.5) + 
-    scale_x_discrete(name = "Clade") + 
+    scale_x_discrete(name = "Onset") + 
     theme_bw() + 
     theme(
           panel.border = element_rect(colour = "black", fill=NA, size=1),
           axis.title = element_text(face="bold"),
           axis.title.x = element_text(size = 20),
-          axis.title.y = element_text(size = 20),
+          axis.title.y = element_text(size = 25),
           axis.text.x = element_text(size = 15), 
           axis.text.y = element_text(size = 15), 
-          legend.text = element_text(size = 16)) + 
+          legend.text = element_text(size = 15)) + 
+    
+    scale_fill_manual(values = c("blue", "green", "purple")) +
     
     guides(fill = guide_legend(title=NULL))
 

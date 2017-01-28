@@ -476,7 +476,7 @@ p<-  pirateplot(formula = out.n.c0 ~ clade + OnsetD_C, data = c0.dhfonset.Dcon.J
 
 # ggplot - box 
   
-  ggplot(c0.dhfonset.Dcon.Jan.0102, 
+  c2 <- ggplot(c0.dhfonset.Dcon.Jan.0102, 
          aes( x = OnsetD_C, y = out.n.c0, fill = clade)) + 
     geom_boxplot(alpha = 0.6, size = 1.5) + 
     scale_x_discrete(name = "Onset") + 
@@ -487,14 +487,18 @@ p<-  pirateplot(formula = out.n.c0 ~ clade + OnsetD_C, data = c0.dhfonset.Dcon.J
       panel.border = element_rect(colour = "black", fill=NA, size=1),
       axis.title = element_text(face="bold"),
       axis.title.x = element_text(size = 20),
-      axis.title.y = element_text(size = 20),
+      axis.title.y = element_text(size = 25),
       axis.text.x = element_text(size = 15), 
       axis.text.y = element_text(size = 15), 
-      legend.text = element_text(size = 16)) + 
+      legend.text = element_text(size = 15)) + 
+    
+    scale_fill_manual(values = c("blue", "green", "purple")) +
     
     guides(fill = guide_legend(title=NULL))
 
-
+# c1 from Viralload.R
+  
+multiplot(c1, c2, cols = 2)
 
 ##### Secondary vs Primary Infection ##### 
 #
