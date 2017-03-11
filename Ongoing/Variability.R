@@ -492,7 +492,7 @@ p<-  pirateplot(formula = out.n.c0 ~ clade + OnsetD_C, data = c0.dhfonset.Dcon.J
       axis.text.y = element_text(size = 15), 
       legend.text = element_text(size = 15)) + 
     
-    scale_fill_manual(values = c("blue", "green", "purple")) +
+    scale_fill_manual(values = c("#619CFF", "#00BA38", "#F8766D")) +
     
     guides(fill = guide_legend(title=NULL))
 
