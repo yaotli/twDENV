@@ -59,12 +59,14 @@ library(ggplot2)
           panel.border = element_rect(colour = "black", fill=NA, size=1),
           axis.title = element_text(face="bold"),
           axis.title.x = element_text(size = 20),
-          axis.title.y = element_text(size = 25),
+          axis.title.y = element_text(size = 22),
           axis.text.x = element_text(size = 15), 
           axis.text.y = element_text(size = 15), 
           legend.text = element_text(size = 15)) + 
     
-    scale_fill_manual(values = c("blue", "green", "purple")) +
+    scale_fill_manual(values = c("#619CFF", "#00BA38", "#F8766D")) +
+    ylab("Viral load (log10 copy number/mL)")
+    
     
     guides(fill = guide_legend(title=NULL))
 
