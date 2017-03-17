@@ -999,6 +999,8 @@ conSUM<-function(ls, nr){
    return(mx)
 }
 
+# conSUMprimer()
+
 ##6 extract 2nd last variant (%) -------------------------------------- 
 
 
