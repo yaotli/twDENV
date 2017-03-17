@@ -60,7 +60,69 @@ library(stringr)
   
   
   
+# create consensus seq for each vcf ####
   
+   ls <- list.files("./allSUM/")
+  ls0 <- gsub(".csv", "",gsub("SUM", "", ls))
   
+  # aim: to generate .fas of consensus sequence for each sample 
   
+  library(seqinr)
+  
+  # use 2001 consensus as backbone
+  
+  ff <- read.fasta("./2001Con.fas")
+  ff.seq <- getSequence(ff)
+  ff.seq.u <- unlist(ff.seq)
+  
+  for (i in 1:length(ls)){
+    
+    # readin summarized file (.csv) derived from .bam
+    
+    ff.i <- read.csv(paste0("./allSUM/", ls[i] ) )
+    lth <- length(ff.i)
+    cons <- c()
+    
+    # get consensus nucleotide for each position
+    
+    for(k in 3: lth){
+      
+      tcc = sum( ff.i[1,k] + ff.i[2,k] + ff.i[3,k] + ff.i[4,k])   
+      
+      if ( ( ff.i[1,k] | ff.i[2,k] | ff.i[3,k] | ff.i[4,k] | ff.i[5,k]) != 0 ){
+        
+        aamatrix <- c("a","t","c","g")
+        
+        nmax <-  which.max( c( ff.i[1,k], ff.i[2,k], ff.i[3,k], ff.i[4,k]) )
+        
+        cons[ length(cons) +1 ] <-  aamatrix[nmax]  
+        
+      }else{
+        
+        cons[length(cons) +1 ] = "-" }
+    }
+    
+    # refill gap; original summarized file comprises 1-3000 in ORF
+    
+    cons <- c(cons, rep("-", length(ff.seq.u)-3000) )
+    
+    cons.u <- c()
+    
+    for (l in 1: length(ff.seq.u)){
+      
+      if (cons[l] == "-"){
+        
+        cons.u[l] <- ff.seq.u[l]
+        
+      }else{
+        
+        cons.u[l] <- cons[l]
+      }
+    }
+    
+    write.fasta(list(cons.u), file.out = paste0("./confas/", ls0[i], ".fasta"), 
+                
+                names = gsub("/", "_", attributes(ff)$names, ) )
+    
+  }
   
