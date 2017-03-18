@@ -13,56 +13,68 @@ library(stringr)
     
       lsvcf <- list.files("./vcfresult/")
     lsvcf.o <- c(lsvcf[388:414], lsvcf[1:387])
-  
+
   # list of whole, forward-only or reverse-only file lists
     
   lsvcf_f <- which(grepl("f.vcf", lsvcf.o) == TRUE)
   lsvcf_r <- which(grepl("r.vcf", lsvcf.o) == TRUE)
   lsvcf_w <-setdiff(  setdiff( seq(1, length(lsvcf.o)), lsvcf_f), lsvcf_r)
   
-  vcf0 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_w[i]]) )
-  vcf1 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_f[i]]) )
-  vcf2 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_r[i]]) )
+  lsvcf.n <- gsub(".bam.vcf", "", lsvcf.o[lsvcf_w])
   
-  # vatiants in E but not in primer
-  gf1 <- setdiff(which(vcf0[,2] %in% E_nt == TRUE), 
-                 which(vcf0[,2] %in% Primer == TRUE) )
+  # create a list: SUMvcf
   
-  # forward in primer_r and in E 
-  gf2 <- interaction(which(vcf1[,2] %in% Primer_r == TRUE),
-                   which(vcf1[,2] %in% E_nt == TRUE) )
+  SUMvcf <- list()
   
-  # reverse in primer_f and in E
-  gf3 <- intersect(which(vcf2[,2] %in% Primer_f == TRUE),
-                   which(vcf2[,2] %in% E_nt == TRUE) )
-
-  # combine the eligible variants
-  gf_u <- rbind(vcf0[gf1, ], vcf1[gf2, ], vcf2[gf3,])
-  
-  
-  # forward ref alleles / reverse ref / forward non-ref / reverse non-ref alleles
-  
-  x1 <- sapply(lapply(strsplit(as.character(gf_u$V8), ";"), "[", 4), 
-         function(x){
-           y = str_match(x, "=([0-9,]+)")[2]
-           return(y)
-         })
-      
-  x2 <- sapply(strsplit(x1, ","), function(x){
+  for(i in 1: length(lsvcf_w)){
     
-    x = as.numeric(x)
-    x_sum <- sum(x)
-    x_ref <- sum(x[1:2])
-      x_v <- sum(x[3:4])
-    v_freq <- x_v / x_sum
-     pi_i <- ((x_v)*(x_sum - x_v))/ ( ((x_sum)*(x_sum - 1))/2 )
+    vcf0 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_w[i]] ) )
+    vcf1 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_f[i]] ) )
+    vcf2 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_r[i]] ) )
+    
+    # vatiants in E but not in primer
+    gf1 <- setdiff(which(vcf0[,2] %in% E_nt == TRUE), 
+                   which(vcf0[,2] %in% Primer == TRUE) )
+    
+    # forward in primer_r and in E 
+    gf2 <- intersect(which(vcf1[,2] %in% Primer_r == TRUE),
+                       which(vcf1[,2] %in% E_nt == TRUE) )
+    
+    # reverse in primer_f and in E
+    gf3 <- intersect(which(vcf2[,2] %in% Primer_f == TRUE),
+                     which(vcf2[,2] %in% E_nt == TRUE) )
+    
+    # combine the eligible variants
+    gf_u <- rbind(vcf0[gf1, ], vcf1[gf2, ], vcf2[gf3,])
+    gf_u <- gf_u[order(gf_u[,2]), ]
+    
+    # forward ref alleles / reverse ref / forward non-ref / reverse non-ref alleles
+    
+    x1 <- sapply(lapply(strsplit(as.character(gf_u$V8), ";"), "[", 4), 
+                 function(x){
+                   y = str_match(x, "=([0-9,]+)")[2]
+                   return(y)
+                 })
+    
+    x2 <- sapply(strsplit(x1, ","), function(x){
       
-    return(y = c(v_freq, pi_i, x_v, x_ref, x_sum))  
+      x = as.numeric(x)
+      x_sum <- sum(x)
+      x_ref <- sum(x[1:2])
+      x_v <- sum(x[3:4])
+      v_freq <- x_v / x_sum
+      pi_i <- ((x_v)*(x_sum - x_v))/ ( ((x_sum)*(x_sum - 1))/2 )
+      
+      return(y = c(v_freq, pi_i, x_v, x_ref, x_sum))  
     })
-         
-  y <- cbind(gf_u, t(x2))[, c(2, 4, 5, 6, 9, 10, 11, 12, 13)]
-  colnames(y) <- c("pos", "ref", "alt", "qual","alt_freq", "pi", "alt_n", "ref_n", "n")
+    
+    y <- cbind(gf_u, t(x2))[, c(2, 4, 5, 6, 9, 10, 11, 12, 13)]
+    colnames(y) <- c("pos", "ref", "alt", "qual","alt_freq", "pi", "alt_n", "ref_n", "n")
+    
+    SUMvcf[[i]] <- y
+  }
   
+ names(SUMvcf) <- lsvcf.n
   
   
   
