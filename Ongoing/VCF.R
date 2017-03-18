@@ -1,4 +1,4 @@
-# call variant number, and caculate pi
+# pase the .vcf files ####
 
 library(stringr)
 
@@ -76,10 +76,8 @@ library(stringr)
   
  names(SUMvcf) <- lsvcf.n
   
-  
-  
-  
-  
+ # SUMvcf_bind = do.call("rbind", SUMvcf) 
+ # write.csv(SUMvcf_bind, "SUMvcf_bind.csv") 
   
 # create consensus seq for each vcf ####
   
@@ -146,4 +144,28 @@ library(stringr)
                 names = gsub("/", "_", attributes(ff)$names, ) )
     
   }
+  
+  
+  
+# analyses on .vcf files ####
+  
+  var_pi_vcf <- t(sapply(SUMvcf, function(x){
+    
+    y.1 <- length( which(x$n >= 1000) )
+    y.2 <- sum(x[which(x$n >= 1000), ]$pi)/ (2421 - 937) 
+    
+    return(y = c(y.1, y.2))
+    
+  }))
+  
+  colnames(var_pi_vcf) <- c("n", "pi")
+  # write.csv(var_pi_vcf, "var_pi_vcf.csv")
+  
+  
+  
+  
+  
+  
+  
+  
   
