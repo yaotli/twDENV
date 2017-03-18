@@ -262,11 +262,17 @@ variantPT <- function(df, pc, nr, adjER){
 #2.4 ls of variantPT
 
 lsvariantPT <- function(df, pc, nr, adjER, listname){
-                                                # data source: cSUM
+
+  # df = dataframe class
+  # Lsi is the splitted list
   
   LSi = split(df, rep(1:length(listname), each = 5))
   
+  # do variantPT then combine to VR
+  
   VR = do.call("rbind" , lapply(LSi, variantPT, pc=pc, nr=nr, adjER=adjER))
+  
+  # create labels for each row
   
   n0 = attributes(VR)$row.names
   n1 = strsplit(n0, split=".", fixed=T)
@@ -281,6 +287,7 @@ lsvariantPT <- function(df, pc, nr, adjER, listname){
     rr = rep(name, time)
     return(rr)      }) )
   
+  # label and split again as list
   
   nn<-factor(nn, levels=unique(nn))
   VRn = split(VR, nn)
