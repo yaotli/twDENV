@@ -1,3 +1,5 @@
+# call variant number, and caculate pi
+
 library(stringr)
 
   # primer and E protein regions
@@ -9,17 +11,18 @@ library(stringr)
 
   # read-in vcf files
     
-    lsvcf <-  list.files("./vcfresult/")
+      lsvcf <- list.files("./vcfresult/")
+    lsvcf.o <- c(lsvcf[388:414], lsvcf[1:387])
   
   # list of whole, forward-only or reverse-only file lists
     
-  lsvcf_f <- which(grepl("f.vcf", lsvcf) == TRUE)
-  lsvcf_r <- which(grepl("r.vcf", lsvcf) == TRUE)
-  lsvcf_w <-setdiff(  setdiff( seq(1, length(lsvcf)), lsvcf_f), lsvcf_r)
+  lsvcf_f <- which(grepl("f.vcf", lsvcf.o) == TRUE)
+  lsvcf_r <- which(grepl("r.vcf", lsvcf.o) == TRUE)
+  lsvcf_w <-setdiff(  setdiff( seq(1, length(lsvcf.o)), lsvcf_f), lsvcf_r)
   
-  vcf0 <- read.table(paste0("./vcfresult/", lsvcf[lsvcf_w[i]]) )
-  vcf1 <- read.table(paste0("./vcfresult/", lsvcf[lsvcf_f[i]]) )
-  vcf2 <- read.table(paste0("./vcfresult/", lsvcf[lsvcf_r[i]]) )
+  vcf0 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_w[i]]) )
+  vcf1 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_f[i]]) )
+  vcf2 <- read.table( paste0("./vcfresult/", lsvcf.o[lsvcf_r[i]]) )
   
   # vatiants in E but not in primer
   gf1 <- setdiff(which(vcf0[,2] %in% E_nt == TRUE), 
@@ -37,6 +40,8 @@ library(stringr)
   gf_u <- rbind(vcf0[gf1, ], vcf1[gf2, ], vcf2[gf3,])
   
   
+  # forward ref alleles / reverse ref / forward non-ref / reverse non-ref alleles
+  
   x1 <- sapply(lapply(strsplit(as.character(gf_u$V8), ";"), "[", 4), 
          function(x){
            y = str_match(x, "=([0-9,]+)")[2]
@@ -49,13 +54,17 @@ library(stringr)
     x_sum <- sum(x)
     x_ref <- sum(x[1:2])
       x_v <- sum(x[3:4])
-    v_feq <- x_v / x_sum
-     pi_i <- ((x_v)*(x_sum - x_v))/ (((x_sum)*(x_sum - 1))/2)
+    v_freq <- x_v / x_sum
+     pi_i <- ((x_v)*(x_sum - x_v))/ ( ((x_sum)*(x_sum - 1))/2 )
       
-    return(y = c(v_feq, pi_i, x_v, x_ref, x_sum))  
+    return(y = c(v_freq, pi_i, x_v, x_ref, x_sum))  
     })
          
-  y <- cbind(gf_u, t(x2))
+  y <- cbind(gf_u, t(x2))[, c(2, 4, 5, 6, 9, 10, 11, 12, 13)]
+  colnames(y) <- c("pos", "ref", "alt", "qual","alt_freq", "pi", "alt_n", "ref_n", "n")
+  
+  
+  
   
   
   
