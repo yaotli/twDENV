@@ -1,0 +1,14 @@
+cd sorted
+for f in $(ls *.bam) ;
+do lofreq call -f ~/Desktop/bami/confas/$f.fasta  -o ~/Desktop/bami/vcfi/$f.vcf $f ;
+done
+
+cd ~/Desktop/bami/bam_f
+for f in $(ls *.bam) ;
+do lofreq call -f ~/Desktop/bami/confas/$f.fasta  -o ~/Desktop/bami/vcfi/${f/.bam/.bam_f.vcf} $f ;
+done
+
+cd ~/Desktop/bami/bam_r
+for f in $(ls *.bam) ;
+do lofreq call -f ~/Desktop/bami/confas/$f.fasta  -o ~/Desktop/bami/vcfi/${f/.bam/.bam_r.vcf} $f ;
+done
