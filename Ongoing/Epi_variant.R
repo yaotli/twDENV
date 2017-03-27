@@ -1,7 +1,7 @@
 # Epi and variants 
 
 # result from lofreq: var_pi_vcf
-# result from Poisson distribution:
+# result from Poisson distribution: var_pi_PT
 #
 #
 
@@ -45,6 +45,7 @@ combinedcsv <- do.call("rbind", lapply(  paste0("~/twDENV/allSUM/", lsarrange ) 
     return(y = c(y.1, y.2))
     
   }))
+  colnames(var_pi_PT) <- c("n", "pi")
   
   
   
