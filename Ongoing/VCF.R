@@ -152,7 +152,7 @@ library(stringr)
   var_pi_vcf <- t(sapply(SUMvcf, function(x){
     
     y.1 <- length( which(x$n >= 1000) )
-    y.2 <- sum(x[which(x$n >= 1000), ]$pi)/ (2421 - 937) 
+    y.2 <- sum(x[which(x$n >= 1000), ]$pi)/ (2421 - 937 + 1) 
     
     return(y = c(y.1, y.2))
     
