@@ -48,6 +48,95 @@ combinedcsv <- do.call("rbind", lapply(  paste0("~/twDENV/allSUM/", lsarrange ) 
   colnames(var_pi_PT) <- c("n", "pi")
   
   
+# read-in epi date  
+  
+library(stringr)
+    
+  epi_demo0 <- read.csv("./Sources/epi_data_csv.csv",stringsAsFactors = FALSE)
+  colnames(epi_demo0) = c("ID", "C1", "DHF", "Sex", "Age", 
+                          "DoSamp", "IsoD", "TpIll", "Snd", "R", 
+                          "X", "Clade", "D", "Info")
+  
+  # remove previous testing result
+  
+     epi_demo0 <- epi_demo0[,-c(11, 13)]
+  epi_demo0$ID <- gsub(pattern = "C1", replacement = "_C1", epi_demo0$ID)
+  
+  epi_demo0[,12][ which(epi_demo0[,12] == "no data") ] = "Missing"
+  epi_demo0[,12][ which(epi_demo0[,12] == "conta") ] = "Dirty"
+
+  ordertem <- c()
+  for(i in 1: dim(var_pi_PT)[1]){
+    
+    ordertem[ length(ordertem) + 1] = match(x = rownames(var_pi_PT)[i], epi_demo0$ID )
+  }
+  
+  # order as variant data, and keep only 2001-2003 data
+  epi_demo_ordered <- epi_demo0[ordertem, ][c(1:138), ]
+  
+  
+  # combine previous data
+  
+  epi_demo_ordered[, c(13, 14)] = var_pi_PT[, c(1,2)][c(1:138), ]
+  epi_demo_ordered[, c(15, 16)] = var_pi_vcf[, c(1,2)]
+  
+  colnames(epi_demo_ordered)[13:16] = c("PT_n", "PT_pi", "vcf_n", "vcg_pi")
+  
+  
+# Figure: Epi_var
+# 
+# c1 = 0
+# clade 
+# IsoD  
+  
+  
+library(ggplot2)  
+library(dplyr)
+  
+epidemo_var_epi_clade_77 <- 
+  
+  epi_demo_ordered %>%
+   filter(C1 == 0) %>%
+  select(ID, Clade, IsoD, PT_n, vcf_n)
+  
+  
+  # plotting 
+
+  ggplot(data = epidemo_var_epi_clade_77, 
+         
+         aes(x=IsoD, y=PT_n, color = Clade)) + 
+    
+    geom_point(size=4, alpha = 0.9) +
+    geom_point(color = "black", size=4.01, alpha = 1, shape = 1) +
+    
+    expand_limits(x=c(0.75:2.5)) +
+    scale_x_continuous(breaks=seq(0.75,2.5,0.25), labels = seq(2001.75, 2003.5, by = 0.25)) + 
+    
+    ylab("No. Variant") + xlab("Year") + 
+    # ggtitle("2001-2003") + 
+    theme_bw()+
+    theme(axis.title = element_text(size = 20), 
+          axis.text.x = element_text(size = 13), 
+          axis.text.y = element_text(size = 16), 
+          plot.title = element_text(size = 25),
+          legend.position = c(0.1, 0.845) ) +
+    scale_color_manual(values = c("#619CFF", "#00BA38", "#F8766D")) 
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    
+    
   
   
   
