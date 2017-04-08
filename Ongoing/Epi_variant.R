@@ -80,7 +80,7 @@ library(stringr)
   epi_demo_ordered[, c(13, 14)] = var_pi_PT[, c(1,2)][c(1:138), ]
   epi_demo_ordered[, c(15, 16)] = var_pi_vcf[, c(1,2)]
   
-  colnames(epi_demo_ordered)[13:16] = c("PT_n", "PT_pi", "vcf_n", "vcg_pi")
+  colnames(epi_demo_ordered)[13:16] = c("PT_n", "PT_pi", "vcf_n", "vcf_pi")
   
   
 # Figure: Epi_var
@@ -123,10 +123,45 @@ epidemo_var_epi_clade_77 <-
     scale_color_manual(values = c("#619CFF", "#00BA38", "#F8766D")) 
   
   
+# genetic diversity across clade and clinical phase
+#
+  
+  
+library(ggplot2)  
+library(dplyr)
 
+epidemo_var_TpIll_clade_77 =     
   
+  epi_demo_ordered %>%
+    filter(C1 == 0) %>%
+    select(ID, Clade, TpIll, PT_n, PT_pi, vcf_n, vcf_pi)
   
+  # define acute phase (0-3)
+
+  epidemo_var_TpIll_clade_77[,8] = 0
+  epidemo_var_TpIll_clade_77[, 8][which( epidemo_var_TpIll_clade_77$TpIll < 4)] = "0-3"
+  epidemo_var_TpIll_clade_77[, 8][which( epidemo_var_TpIll_clade_77$TpIll >= 4 )] = "4+"
+
+  colnames(epidemo_var_TpIll_clade_77)[8] = "Acute"
+
+
+  # ggplot 
   
+  ggplot(epidemo_var_TpIll_clade_77, aes(x = Clade, y = vcf_pi, fill = Acute) ) + 
+    
+    theme_bw()+
+    scale_y_continuous(breaks = c(0, 0.0005, 0.001, 0.0015), 
+                       labels = c(0, 0.05, 0.1, 0.15)) + 
+    
+    ylab("Genetic diversity (pi x 100)") + xlab("") + 
+    theme(axis.title = element_text(size = 20), 
+          axis.text.x = element_text(size = 15), 
+          axis.text.y = element_text(size = 10), 
+          plot.title = element_text(size = 25),
+          legend.position = c(0.1, 0.845),
+          legend.title = element_blank())  +
+    geom_dotplot(binaxis = 'y', stackdir = 'center', 
+                 position=position_dodge(1), binwidth = 0.00003) 
   
   
   
