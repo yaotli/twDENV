@@ -146,7 +146,7 @@ epidemo_var_TpIll_clade_77 =
 
 
   # ggplot 
-  
+p=  
   ggplot(epidemo_var_TpIll_clade_77, aes(x = Clade, y = vcf_pi, fill = Acute) ) + 
     
     theme_bw()+
@@ -163,8 +163,10 @@ epidemo_var_TpIll_clade_77 =
     geom_dotplot(binaxis = 'y', stackdir = 'center', 
                  position=position_dodge(1), binwidth = 0.00003) 
   
-  
-  
+  # add interhost pi
+ p + geom_point(x = 1, y = 0.00031, shape = 5, size = 5) + 
+   geom_point(x = 2, y = 0.00044, shape = 5, size = 5) + 
+   geom_point(x = 3, y = 0.00094, shape = 5, size = 5) 
   
   
   
