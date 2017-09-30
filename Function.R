@@ -1483,5 +1483,22 @@ bamseqprepID <- function(bam){
 }
 
 
+### getDes ----------------
 
+getDes <- function( node, curr = NULL )
+{
+  if( is.null(curr) ){ curr <- vector() }
+  
+  edgemax   <- tre.d[ c(2,1) ]
+  daughters <- edgemax[which( edgemax[,1] == node ), 2]
+  
+  curr <- c(curr, daughters)
+  nd   <- which( daughters >= length( which( tre.d$isTip )) )
+  
+  if( length(nd) > 0)
+  {
+    for(i in 1:length(nd) ){ curr <- getDes( daughters[ nd[i] ], curr ) }
+  }
+  return(curr)
+}
 
