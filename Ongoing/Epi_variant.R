@@ -171,13 +171,35 @@ p=
   
   
   
-  
+
+### population and vatiants ----------------
     
-    
-  
-  
-  
-  
-  
-  
-  
+csv.dist_var <- read.csv( "~/twDENV/Sources/dist_var_analysis_ed.csv", stringsAsFactors = FALSE)    
+colnames(csv.dist_var)[4] <- "Group"
+csv.dist_var$Group <- as.character( csv.dist_var$Group )
+
+Period <- rep( "3", dim(csv.dist_var)[1] )
+Period[ which(csv.dist_var$IsoD < 1 ) ] = "1"
+Period[ which( 1 <= csv.dist_var$IsoD & csv.dist_var$IsoD < 1.7 ) ] = "2"
+
+csv.dist_var <- data.frame( csv.dist_var, Period )
+
+# 1 
+a=
+ggplot( csv.dist_var, aes( x = Group, y = n_new) ) + theme_bw() + 
+  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
+
+# 2
+b=
+ggplot( csv.dist_var, aes( x = Group, y = Population_density) ) + theme_bw() + 
+  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
+
+# 3 
+c=
+ggplot( csv.dist_var, aes( x = Period, y = n_new) ) + theme_bw() + 
+  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
+
+
+
+
+multiplot(a, b, c, cols = 1)  
