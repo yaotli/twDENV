@@ -195,7 +195,23 @@ df.a =
   select( Group, n_new ) %>%
   mutate( g1 = ifelse( Group == "1", 1, 0 ) )
 
+df.a.1 = 
+  csv.dist_var %>% 
+  filter( Group == "1"| Group == "3" ) %>%
+  select( Group, n_new ) %>%
+  mutate( g = ifelse( Group == "1", 1, 0 ) )
+
+df.a.2 = 
+  csv.dist_var %>% 
+  filter( Group == "2"| Group == "3" ) %>%
+  select( Group, n_new ) %>%
+  mutate( g = ifelse( Group == "2", 1, 0 ) )
+
+
 wilcox.test( n_new ~ g1, df.a)
+wilcox.test( n_new ~ g, df.a.1)
+wilcox.test( n_new ~ g, df.a.2)
+
 
 a=
 ggplot( csv.dist_var, aes( x = Group, y = n_new) ) + theme_bw() + 
@@ -210,7 +226,15 @@ df.b =
   select( Group, Population_density ) %>%
   mutate( g2 = ifelse( Group == "1", 1, 0 ) )
 
+
+df.b.1 = 
+  csv.dist_var %>% 
+  filter( Group == "2"| Group == "3" ) %>%
+  select( Group, Population_density ) %>%
+  mutate( g = ifelse( Group == "2", 1, 0 ) )
+
 wilcox.test( Population_density ~ g2, df.b)
+wilcox.test( Population_density ~ g, df.b.1)
 
 b=
 ggplot( csv.dist_var, aes( x = Group, y = Population_density) ) + theme_bw() + 
@@ -223,7 +247,15 @@ df.c =
   select( Period, n_new ) %>%
   mutate( g3 = ifelse( Period == "1", 1, 0 ) )
 
+
+df.c.1 = 
+  csv.dist_var %>% 
+  filter( Period == "2"| Group == "3" ) %>%
+  select( Period, n_new ) %>%
+  mutate( g = ifelse( Period == "2", 1, 0 ) )
+
 wilcox.test( n_new ~ g3, df.c)
+wilcox.test( n_new ~ g, df.c.1)
 
 
 c=
