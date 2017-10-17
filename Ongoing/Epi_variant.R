@@ -173,7 +173,10 @@ p=
   
 
 ### population and vatiants ----------------
-    
+
+ require( dplyr )
+ require( ggpubr )
+     
 csv.dist_var <- read.csv( "~/twDENV/Sources/dist_var_analysis_ed.csv", stringsAsFactors = FALSE)    
 colnames(csv.dist_var)[4] <- "Group"
 csv.dist_var$Group <- as.character( csv.dist_var$Group )
@@ -184,22 +187,77 @@ Period[ which( 1 <= csv.dist_var$IsoD & csv.dist_var$IsoD < 1.7 ) ] = "2"
 
 csv.dist_var <- data.frame( csv.dist_var, Period )
 
+
 # 1 
+df.a = 
+  csv.dist_var %>% 
+  filter( Group == "1"| Group == "2" ) %>%
+  select( Group, n_new ) %>%
+  mutate( g1 = ifelse( Group == "1", 1, 0 ) )
+
+wilcox.test( n_new ~ g1, df.a)
+
 a=
 ggplot( csv.dist_var, aes( x = Group, y = n_new) ) + theme_bw() + 
   geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
 
+
+
 # 2
+df.b = 
+  csv.dist_var %>% 
+  filter( Group == "1"| Group == "2" ) %>%
+  select( Group, Population_density ) %>%
+  mutate( g2 = ifelse( Group == "1", 1, 0 ) )
+
+wilcox.test( Population_density ~ g2, df.b)
+
 b=
 ggplot( csv.dist_var, aes( x = Group, y = Population_density) ) + theme_bw() + 
   geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
 
 # 3 
+df.c = 
+  csv.dist_var %>% 
+  filter( Period == "1"| Group == "2" ) %>%
+  select( Period, n_new ) %>%
+  mutate( g3 = ifelse( Period == "1", 1, 0 ) )
+
+wilcox.test( n_new ~ g3, df.c)
+
+
 c=
 ggplot( csv.dist_var, aes( x = Period, y = n_new) ) + theme_bw() + 
   geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
 
 
+# 4
+
+d = 
+ggplot( csv.dist_var, aes( x = Group, y = time_case_n ) ) + theme_bw() + 
+  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
 
 
-multiplot(a, b, c, cols = 1)  
+df.d = 
+  csv.dist_var %>% 
+  filter( Group == "1"| Group == "3" ) %>%
+  select( Group, time_case_n ) %>%
+  mutate( g = ifelse( Group == "1", 1, 0 ) )
+
+wilcox.test( time_case_n ~ g, df.d)
+
+
+df.e = 
+  csv.dist_var %>% 
+  filter( Group == "2"| Group == "3" ) %>%
+  select( Group, time_case_n ) %>%
+  mutate( g = ifelse( Group == "2", 1, 0 ) )
+
+wilcox.test( time_case_n ~ g, df.e)
+
+
+ggarrange(a, b, c, d, ncol = 1, nrow = 4 )  
+ggsave("MWtest.pdf", width = 3, height = 6 )
+
+
+
