@@ -215,10 +215,17 @@ wilcox.test( n_new ~ g, df.a.2)
 
 a=
 ggplot( csv.dist_var, aes( x = Group, y = n_new) ) + theme_bw() + 
-  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
+  geom_violin( draw_quantiles = c(0.5) ) + 
+  geom_jitter( position=position_jitter(0.05), alpha = 0.4, size = 2) +
+  ylab("No. of variants") + 
+  theme( axis.title = element_text(size = 18), 
+         axis.text = element_text(size = 15)) 
+  # + stat_summary(fun.y=median, geom="point", size=25, shape = 95)
 
 
 
+
+  
 # 2
 df.b = 
   csv.dist_var %>% 
@@ -238,7 +245,12 @@ wilcox.test( Population_density ~ g, df.b.1)
 
 b=
 ggplot( csv.dist_var, aes( x = Group, y = Population_density) ) + theme_bw() + 
-  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
+  geom_violin( ) +
+  geom_violin( draw_quantiles = c(0.5) ) + 
+  geom_jitter( position=position_jitter(0.05), alpha = 0.4, size = 2) +
+  ylab("Population density") + 
+  theme( axis.title = element_text(size = 18), 
+         axis.text = element_text(size = 15)) 
 
 # 3 
 df.c = 
@@ -267,7 +279,13 @@ ggplot( csv.dist_var, aes( x = Period, y = n_new) ) + theme_bw() +
 
 d = 
 ggplot( csv.dist_var, aes( x = Group, y = time_case_n ) ) + theme_bw() + 
-  geom_violin( ) + geom_jitter( position=position_jitter(0.05), alpha = 0.5)
+  geom_violin( ) +
+  geom_violin( draw_quantiles = c(0.5) ) + 
+  geom_jitter( position=position_jitter(0.05), alpha = 0.4, size = 2) +
+  ylab("Case number / Li") + 
+  theme( axis.title.x = element_text(size = 18),
+         axis.title.y = element_text(size = 16),
+         axis.text = element_text(size = 15)) 
 
 
 df.d = 
@@ -288,7 +306,7 @@ df.e =
 wilcox.test( time_case_n ~ g, df.e)
 
 
-ggarrange(a, b, c, d, ncol = 1, nrow = 4 )  
+ggarrange(a, b, d, ncol = 1, nrow = 3)  
 ggsave("MWtest.pdf", width = 3, height = 6 )
 
 
