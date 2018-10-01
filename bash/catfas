@@ -1,0 +1,7 @@
+#!=bin/bash
+
+cd raw/test 
+
+for f in $(ls *.gz);
+do cat ../seq/2001Ia | ~/bcftools/bin/bcftools consensus -e '(DP4[0]+DP4[1])>(DP4[2]+DP4[3])' $f > ${f/.gz/.fas};
+done

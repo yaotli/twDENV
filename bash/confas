@@ -1,0 +1,11 @@
+#!=bin/bash
+
+cd raw/test
+
+for f in $(ls *_s.bam);
+do ~/samtools/bin/samtools mpileup -d 40000 -uf ../seq/2001Ia $f | ~/bcftools/bin/bcftools call -cv -Oz -o ${f/_s.bam/2.gz};
+done
+
+for f in $(ls *2.gz);
+do ~/htslib/bin/tabix $f;
+done

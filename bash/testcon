@@ -1,0 +1,9 @@
+#!bin/bash 
+
+cd raw/test
+
+for f in $(ls *_s.bam);
+do ~/samtools_v1.3.1/bin/samtools mpileup -uf ../seq/2001Ia $f | bcftools view -cg - | vcfutils.pl vcf2fq > ${f/_s.bam/.fasta};
+done
+
+

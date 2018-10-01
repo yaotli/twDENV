@@ -1,0 +1,18 @@
+#!bin/bash
+
+#variant call by lofreq
+
+cd raw/test
+
+for f in $(ls *_s.bam);
+do ~/lofreq_star_v2.1.2/bin/lofreq call -f ${f/_s.bam/.fas} -o ${f/_s.bam/.vcf} $f;
+done
+
+for f in $(ls *_sf.bam);
+do ~/lofreq_star_v2.1.2/bin/lofreq call -f ${f/_sf.bam/.fas} -o ${f/_sf.bam/_f.vcf} $f;
+done
+
+for f in $(ls *_sr.bam);
+do ~/lofreq_star_v2.1.2/bin/lofreq call -f ${f/_sr.bam/.fas} -o ${f/_sr.bam/_r.vcf} $f;
+done
+
